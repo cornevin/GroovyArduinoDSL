@@ -2,6 +2,8 @@ package groovuinoml.dsl
 
 import kernel.behavioral.Action
 import kernel.behavioral.State
+import kernel.structural.SIGNAL
+import kernel.structural.Sensor
 
 abstract class GroovuinoMLBasescript extends Script {
 	// sensor "name" pin n
@@ -16,7 +18,7 @@ abstract class GroovuinoMLBasescript extends Script {
 	
 	// state "name" means actuator becomes signal [and actuator becomes signal]*n
 	def state(String name) {
-		List<Action> actions = new ArrayList<Action>()
+		List<Action> actions = new ArrayList<>()
 		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
 		// recursive closure to allow multiple and statements
 		def closure
@@ -37,12 +39,20 @@ abstract class GroovuinoMLBasescript extends Script {
 		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().setInitialState(state)
 	}
 	
-	// from state1 to state2 when sensor becomes signal
+	// from state1 to state2 when sensor becomes signal [and sensor2 becomes signal2]
 	def from(State state1) {
-		[to: { state2 -> 
-			[when: { sensor ->
+        List<Sensor> sensors = new ArrayList<>()
+        List<SIGNAL> signals = new ArrayList<>()
+
+        def closure
+		[to: { state2 ->
+            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,sensors,signals)
+            [when: closure = { sensor ->
 				[becomes: { signal -> 
-					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
+					//((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
+                    sensors.add(sensor)
+                    signals.add(signal)
+                    [and: closure]
 				}]
 			}]
 		}]

@@ -5,11 +5,13 @@ import kernel.generator.Visitor;
 import kernel.structural.SIGNAL;
 import kernel.structural.Sensor;
 
+import java.util.List;
+
 public class Transition implements Visitable {
 
 	private State next;
-	private Sensor sensor;
-	private SIGNAL value;
+	private List<Sensor> sensor;
+	private List<SIGNAL> value;
 
 	public State getNext() {
 		return next;
@@ -19,19 +21,19 @@ public class Transition implements Visitable {
 		this.next = next;
 	}
 
-	public Sensor getSensor() {
+	public List<Sensor> getSensor() {
 		return sensor;
 	}
 
-	public void setSensor(Sensor sensor) {
+	public void setSensor(List<Sensor> sensor) {
 		this.sensor = sensor;
 	}
 
-	public SIGNAL getValue() {
+	public List<SIGNAL> getValue() {
 		return value;
 	}
 
-	public void setValue(SIGNAL value) {
+	public void setValue(List<SIGNAL> value) {
 		this.value = value;
 	}
 
