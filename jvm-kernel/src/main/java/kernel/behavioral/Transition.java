@@ -2,25 +2,19 @@ package kernel.behavioral;
 
 import kernel.generator.Visitable;
 import kernel.generator.Visitor;
-import kernel.structural.SIGNAL;
-import kernel.structural.Sensor;
-
-import java.util.List;
 
 public class Transition implements Visitable {
 
 	private State next;
+	private ConditionalStatement conditionalStatement;
 
-	public List<ConditionalStatement> getConditionalStatements() {
-		return conditionalStatements;
+	public ConditionalStatement getConditionalStatements() {
+		return conditionalStatement;
 	}
 
-	public void setConditionalStatements(List<ConditionalStatement> conditionalStatements) {
-		this.conditionalStatements = conditionalStatements;
+	public void setConditionalStatements(ConditionalStatement conditionalStatements) {
+		this.conditionalStatement = conditionalStatements;
 	}
-
-	private List<ConditionalStatement> conditionalStatements;
-
 
 	public State getNext() {
 		return next;

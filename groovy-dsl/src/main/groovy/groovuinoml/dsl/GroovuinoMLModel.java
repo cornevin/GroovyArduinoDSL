@@ -3,13 +3,13 @@ package groovuinoml.dsl;
 import groovy.lang.Binding;
 import kernel.App;
 import kernel.behavioral.Action;
+import kernel.behavioral.ConditionalStatement;
 import kernel.behavioral.State;
 import kernel.behavioral.Transition;
 import kernel.generator.ToWiring;
 import kernel.generator.Visitor;
 import kernel.structural.Actuator;
 import kernel.structural.Brick;
-import kernel.structural.SIGNAL;
 import kernel.structural.Sensor;
 
 import java.util.ArrayList;
@@ -54,11 +54,10 @@ public class GroovuinoMLModel {
 		this.binding.setVariable(name, state);
 	}
 	
-	public void createTransition(State from, State to, List<Sensor> sensor, List<SIGNAL> value) {
+	public void createTransition(State from, State to, ConditionalStatement conditionalStatement) {
 		Transition transition = new Transition();
 		transition.setNext(to);
-		transition.setSensor(sensor);
-		transition.setValue(value);
+		transition.setConditionalStatements(conditionalStatement);
 		from.setTransition(transition);
 	}
 	

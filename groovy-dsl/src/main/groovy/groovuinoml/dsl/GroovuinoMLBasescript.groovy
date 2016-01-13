@@ -1,6 +1,8 @@
 package groovuinoml.dsl
 
 import kernel.behavioral.Action
+import kernel.behavioral.BooleanExpression
+import kernel.behavioral.ConditionalStatement
 import kernel.behavioral.State
 import kernel.structural.SIGNAL
 import kernel.structural.Sensor
@@ -43,16 +45,25 @@ abstract class GroovuinoMLBasescript extends Script {
 	def from(State state1) {
         List<Sensor> sensors = new ArrayList<>()
         List<SIGNAL> signals = new ArrayList<>()
+		List<BooleanExpression> booleanExpressions = new ArrayList<>()
+		ConditionalStatement conditionalStatement = new ConditionalStatement()
+        conditionalStatement.setBooleanExpressions(booleanExpressions)
+        conditionalStatement.setSensor(sensors)
+        conditionalStatement.setValue(signals)
 
         def closure
 		[to: { state2 ->
-            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,sensors,signals)
+            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,conditionalStatement)
             [when: closure = { sensor ->
 				[becomes: { signal -> 
 					//((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
                     sensors.add(sensor)
                     signals.add(signal)
-                    [and: closure]
+					{
+						bool ->
+                            booleanExpressions.push(bool)
+					}
+              //      [and: closure]
 				}]
 			}]
 		}]
