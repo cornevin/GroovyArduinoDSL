@@ -10,8 +10,17 @@ import java.util.List;
 public class Transition implements Visitable {
 
 	private State next;
-	private List<Sensor> sensor;
-	private List<SIGNAL> value;
+
+	public List<ConditionalStatement> getConditionalStatements() {
+		return conditionalStatements;
+	}
+
+	public void setConditionalStatements(List<ConditionalStatement> conditionalStatements) {
+		this.conditionalStatements = conditionalStatements;
+	}
+
+	private List<ConditionalStatement> conditionalStatements;
+
 
 	public State getNext() {
 		return next;
@@ -21,21 +30,6 @@ public class Transition implements Visitable {
 		this.next = next;
 	}
 
-	public List<Sensor> getSensor() {
-		return sensor;
-	}
-
-	public void setSensor(List<Sensor> sensor) {
-		this.sensor = sensor;
-	}
-
-	public List<SIGNAL> getValue() {
-		return value;
-	}
-
-	public void setValue(List<SIGNAL> value) {
-		this.value = value;
-	}
 
 	@Override
 	public void accept(Visitor visitor) {

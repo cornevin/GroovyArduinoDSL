@@ -3,6 +3,7 @@ package kernel.generator;
 
 import kernel.App;
 import kernel.behavioral.Action;
+import kernel.behavioral.ConditionalStatement;
 import kernel.behavioral.State;
 import kernel.behavioral.Transition;
 import kernel.structural.Actuator;
@@ -73,21 +74,35 @@ public class ToWiring extends Visitor<StringBuffer> {
 	@Override
 	public void visit(Transition transition) {
         w(String.format("   if("));
-        for(int i = 0; i < transition.getSensor().size(); i++) {
-            w(String.format("digitalRead(%d) == %s && ",
-                    transition.getSensor().get(i).getPin(),transition.getValue().get(i)));
-        }
+
         w(String.format(" guard) {"));
 		w("    time = millis();");
 		w(String.format("    state_%s();",transition.getNext().getName()));
 		w("  } else {");
-		w(String.format("    state_%s();",((State) context.get(CURRENT_STATE)).getName()));
+		w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
 		w("  }");
 	}
 
 	@Override
 	public void visit(Action action) {
 		w(String.format("  digitalWrite(%d,%s);",action.getActuator().getPin(),action.getValue()));
+	}
+
+	@Override
+	public void visit(ConditionalStatement conditionalStatement) {
+		int i = 0;
+		for(i = 0; i < conditionalStatement.getSensor().size()-1; i++) {
+			//If the value of the sensor we talk about
+			//equals the value we want
+			w(String.format("digitalRead(%d) == %s %s",
+					conditionalStatement.getSensor().get(i).getPin(),conditionalStatement.getValue().get(i),
+					conditionalStatement.getBooleanExpressions().get(i).getExpression()));
+
+		}
+		w(String.format("digitalRead(%d) == %s &&",
+				conditionalStatement.getSensor().get(i).getPin(),conditionalStatement.getValue().get(i)));
+
+
 	}
 
 }
