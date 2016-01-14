@@ -55,15 +55,12 @@ abstract class GroovuinoMLBasescript extends Script {
 		[to: { state2 ->
             ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,conditionalStatement)
             [when: closure = { sensor ->
-				[becomes: { signal -> 
+				[becomes: { signal, bool = BooleanExpression.AND ->
 					//((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
                     sensors.add(sensor)
                     signals.add(signal)
-					{
-						bool ->
-                            booleanExpressions.push(bool)
-					}
-              //      [and: closure]
+					booleanExpressions.add(bool)
+                    [when: closure]
 				}]
 			}]
 		}]

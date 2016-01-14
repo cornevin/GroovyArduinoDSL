@@ -1,5 +1,6 @@
 package groovuinoml.dsl
 
+import kernel.behavioral.BooleanExpression
 import kernel.structural.SIGNAL
 import org.codehaus.groovy.control.CompilerConfiguration
 
@@ -19,6 +20,8 @@ class GroovuinoMLDSL {
 		
 		binding.setVariable("high", SIGNAL.HIGH)
 		binding.setVariable("low", SIGNAL.LOW)
+		binding.setVariable("and", BooleanExpression.AND)
+		binding.setVariable("or", BooleanExpression.OR)
 	}
 	
 	void eval(File scriptFile) {

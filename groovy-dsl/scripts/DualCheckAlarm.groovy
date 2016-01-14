@@ -11,8 +11,8 @@ state "off" means buzzer becomes low
 
 initial off
 
-from on to off when button1 becomes high and button2 becomes high
-from off to on when button1 becomes low or button2 becomes low
+from on to off when button1 becomes high, and when button2 becomes high
+from off to on when button1 becomes low, or when button2 becomes low
 
 export "DualCheckAlarm"
 

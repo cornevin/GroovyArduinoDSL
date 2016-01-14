@@ -74,7 +74,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 	@Override
 	public void visit(Transition transition) {
         w(String.format("   if("));
-
+		transition.getConditionalStatements().accept(this);
         w(String.format(" guard) {"));
 		w("    time = millis();");
 		w(String.format("    state_%s();",transition.getNext().getName()));
@@ -90,7 +90,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(ConditionalStatement conditionalStatement) {
-		int i = 0;
+		int i;
 		for(i = 0; i < conditionalStatement.getSensor().size()-1; i++) {
 			//If the value of the sensor we talk about
 			//equals the value we want
@@ -99,6 +99,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 					conditionalStatement.getBooleanExpressions().get(i).getExpression()));
 
 		}
+
 		w(String.format("digitalRead(%d) == %s &&",
 				conditionalStatement.getSensor().get(i).getPin(),conditionalStatement.getValue().get(i)));
 
