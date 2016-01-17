@@ -18,7 +18,8 @@ public class GroovuinoML {
 		GroovuinoMLDSL dsl = new GroovuinoMLDSL();
 	//	if(args.length > 0) {
 			//dsl.eval(new File(args[0]));
-			dsl.eval(new File("groovy-dsl/scripts/DualCheckAlarm.groovy"));
+	//		dsl.eval(new File("groovy-dsl/scripts/DualCheckAlarm.groovy"));
+			dsl.eval(new File("groovy-dsl/scripts/MessageInMorse.groovy"));
 	//	} else {
 	//		System.out.println("/!\\ Missing arg: Please specify the path to a Groovy script file to execute");
 	//	}

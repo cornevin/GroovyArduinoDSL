@@ -43,8 +43,24 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 
 		w("void loop() {");
-		w(String.format("  state_%s();", app.getInitial().getName()));
+		if(app.isMorseMode()) {
+			w("  for (int i = 0; i < sizeof(stringToMorseCode) - 1; i++)\n" +
+					"  {\n" +
+					"    // Get the character in the current position\n" +
+					"\tchar tmpChar = stringToMorseCode[i];\n" +
+					"\t// Set the case to lower case\n" +
+					"\ttmpChar = toLowerCase(tmpChar);\n" +
+					"\t// Call the subroutine to get the morse code equivalent for this character\n" +
+					"\tGetChar(tmpChar);\n" +
+					"  }");
+		} else {
+			w(String.format("  state_%s();", app.getInitial().getName()));
+		}
 		w("}");
+
+		if(app.isMorseMode()) {
+			this.generateMorseLanguage();
+		}
 	}
 
 	@Override
@@ -106,4 +122,498 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	}
 
+	private void generateMorseLanguage() {
+		w("int note = 1200;      // music note/pitch\n" +
+				"int dotLen = 100;     // length of the morse code 'dot'\n" +
+				"int dashLen = dotLen * 3;    // length of the morse code 'dash'\n" +
+				"int elemPause = dotLen;  // length of the pause between elements of a character\n" +
+				"int Spaces = dotLen * 3;     // length of the spaces between characters\n" +
+				"int wordPause = dotLen * 7;  // length of the pause between words");
+
+		w("void LightsOff(int delayTime)\n" +
+				"{\n" +
+				" 	digitalWrite(led12, LOW);    \t// turn the LED off  \t\n" +
+				"  	digitalWrite(led6, LOW);\n" +
+				"  	noTone(audio8);\t       \t   \t// stop playing a tone\n" +
+				"  	delay(delayTime);            \t// hold in this position\n" +
+				"}");
+
+
+		w("void MorseDash()\n" +
+				"{\n" +
+				"  digitalWrite(led12, HIGH);  \t// turn the LED on \n" +
+				"  digitalWrite(led6, HIGH);\n" +
+				"  tone(audio8, note, dashLen);\t// start playing a tone\n" +
+				"  delay(dashLen);               // hold in this position\n" +
+				"}");
+
+		w("void MorseDot()\n" +
+				"{\n" +
+				"  digitalWrite(led12, HIGH);  \t// turn the LED on \n" +
+				"  digitalWrite(led6, HIGH); \n" +
+				"  tone(audio8, note, dotLen);\t// start playing a tone\n" +
+				"  delay(dotLen);             \t// hold in this position\n" +
+				"}");
+
+
+		w(" // *** Characters to Morse Code Conversion *** //\n" +
+				" void GetChar(char tmpChar) {\n" +
+				"\t // Take the passed character and use a switch case to find the morse code for that character\n" +
+				"\t switch (tmpChar) {\n" +
+				"\t\t case 'a':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'b':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'c':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'd':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'e':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'f':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'g':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'h':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'i':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'j':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'k':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'l':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'm':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'n':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'o':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'p':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'q':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'r':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 's':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 't':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'u':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'v':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'w':\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'x':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'y':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t case 'z':\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDash();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t MorseDot();\n" +
+				"\t\t\t LightsOff(elemPause);\n" +
+				"\t\t\t break;\n" +
+				"\t\t default:\n" +
+				"\t\t // If a matching character was not found it will default to a blank space\n" +
+				"\t\t LightsOff(Spaces);\n" +
+				"\t }\n" +
+				" }");
+
+	}
 }
+
+
+/**
+ // *** Characters to Morse Code Conversion *** //
+ void GetChar(char tmpChar) {
+	 // Take the passed character and use a switch case to find the morse code for that character
+	 switch (tmpChar) {
+		 case 'a':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'b':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'c':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'd':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'e':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'f':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'g':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'h':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'i':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'j':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'k':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'l':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'm':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'n':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'o':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'p':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 'q':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'r':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 's':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 case 't':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'u':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'v':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'w':
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'x':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'y':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 break;
+		 case 'z':
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDash();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 MorseDot();
+			 LightsOff(elemPause);
+			 break;
+		 default:
+		 // If a matching character was not found it will default to a blank space
+		 LightsOff(Spaces);
+	 }
+ }
+
+
+
+
+ **/

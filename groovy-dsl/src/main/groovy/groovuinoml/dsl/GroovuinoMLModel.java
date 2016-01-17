@@ -20,7 +20,9 @@ public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
 	private State initialState;
-	
+	private boolean morseOn = false;
+	private String messageToTranslate;
+
 	private Binding binding;
 	
 	public GroovuinoMLModel(Binding binding) {
@@ -60,6 +62,11 @@ public class GroovuinoMLModel {
 		transition.setConditionalStatements(conditionalStatement);
 		from.setTransition(transition);
 	}
+
+	public void createMorse(String message) {
+		this.morseOn = true;
+		this.messageToTranslate = message;
+	}
 	
 	public void setInitialState(State state) {
 		this.initialState = state;
@@ -72,6 +79,8 @@ public class GroovuinoMLModel {
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
+		app.setMessageToTranslate(this.messageToTranslate);
+		app.setMorseMode(morseOn);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
 		

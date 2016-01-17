@@ -70,4 +70,13 @@ abstract class GroovuinoMLBasescript extends Script {
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
+
+
+    def translate(String message) {
+        [into: { language ->
+            [with: { actuator ->
+                ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMorse(message)
+            }]
+        }]
+    }
 }

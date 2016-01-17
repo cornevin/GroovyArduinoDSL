@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class ConditionalStatement implements Visitable {
 
-    //Les 2 listes sont forcément de la même longueurs :
+    //Les 2 listes sont forcï¿½ment de la mï¿½me longueurs :
     // dans une transition, on donne la nouvelle valeur attendue
     //d'un sensor. Si ces listes sont > 1, ALORS existe une transition
     private List<Sensor> sensor;
