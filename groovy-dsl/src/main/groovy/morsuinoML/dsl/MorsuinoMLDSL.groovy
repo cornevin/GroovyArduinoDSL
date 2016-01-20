@@ -20,7 +20,6 @@ class MorsuinoMLDSL {
 		binding.setVariable("high", SIGNAL.HIGH)
 		binding.setVariable("low", SIGNAL.LOW)
 		binding.setVariable("and", BooleanExpression.AND)
-		binding.setVariable("or", BooleanExpression.OR)
 	}
 	
 	void eval(File scriptFile) {
