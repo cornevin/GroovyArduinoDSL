@@ -60,7 +60,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("}");
 
 		if(app.isMorseMode()) {
-			this.generateMorseLanguage();
+			this.generateMorseLanguage(app);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	}
 
-	private void generateMorseLanguage() {
+	private void generateMorseLanguage(App app) {
 		w("int note = 1200;      // music note/pitch\n" +
 				"int dotLen = 100;     // length of the morse code 'dot'\n" +
 				"int dashLen = dotLen * 3;    // length of the morse code 'dash'\n" +
@@ -131,11 +131,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 				"int Spaces = dotLen * 3;     // length of the spaces between characters\n" +
 				"int wordPause = dotLen * 7;  // length of the pause between words");
 
-		w("void LightsOff(int delayTime)\n" +
+		w(String.format("void LightsOff(int delayTime)\n" +
 				"{\n" +
 				"  	noTone(8);\t       \t   \t// stop playing a tone\n" +
 				"  	delay(delayTime);            \t// hold in this position\n" +
-				"}");
+				"}"));
 
 
 		w("void MorseDash()\n" +
