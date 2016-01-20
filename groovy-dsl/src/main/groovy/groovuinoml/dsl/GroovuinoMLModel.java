@@ -8,9 +8,7 @@ import kernel.behavioral.State;
 import kernel.behavioral.Transition;
 import kernel.generator.ToWiring;
 import kernel.generator.Visitor;
-import kernel.structural.Actuator;
-import kernel.structural.Brick;
-import kernel.structural.Sensor;
+import kernel.structural.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +17,7 @@ import java.util.List;
 public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
+	private List<Actuator> morseActuators;
 	private State initialState;
 	private boolean morseOn = false;
 	private String messageToTranslate;
@@ -40,12 +39,20 @@ public class GroovuinoMLModel {
 //		System.out.println("> sensor " + name + " on pin " + pinNumber);
 	}
 	
-	public void createActuator(String name, Integer pinNumber) {
-		Actuator actuator = new Actuator();
-		actuator.setName(name);
-		actuator.setPin(pinNumber);
-		this.bricks.add(actuator);
-		this.binding.setVariable(name, actuator);
+	public void createBuzzer(String name, Integer pinNumber) {
+		Buzzer buzzer = new Buzzer();
+		buzzer.setName(name);
+		buzzer.setPin(pinNumber);
+		this.bricks.add(buzzer);
+		this.binding.setVariable(name, buzzer);
+	}
+
+	public void createLed(String name, Integer pinNumber) {
+		Led led = new Led();
+		led.setName(name);
+		led.setPin(pinNumber);
+		this.bricks.add(led);
+		this.binding.setVariable(name, led);
 	}
 	
 	public void createState(String name, List<Action> actions) {
@@ -63,7 +70,8 @@ public class GroovuinoMLModel {
 		from.setTransition(transition);
 	}
 
-	public void createMorse(String message) {
+	public void createMorse(String message, List<Actuator> morseActuators) {
+		this.morseActuators = morseActuators;
 		this.morseOn = true;
 		this.messageToTranslate = message;
 	}
@@ -81,6 +89,7 @@ public class GroovuinoMLModel {
 		app.setInitial(this.initialState);
 		app.setMessageToTranslate(this.messageToTranslate);
 		app.setMorseMode(morseOn);
+		app.setMorseActuators(this.morseActuators);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
 		

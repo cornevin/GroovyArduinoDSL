@@ -3,6 +3,7 @@ package kernel;
 import kernel.behavioral.State;
 import kernel.generator.Visitable;
 import kernel.generator.Visitor;
+import kernel.structural.Actuator;
 import kernel.structural.Brick;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class App implements NamedElement, Visitable {
     private State initial;
     private boolean morseMode = false;
     private String messageToTranslate;
+    private List<Actuator> morseActuators;
 
     @Override
     public void accept(Visitor visitor) {
@@ -73,5 +75,13 @@ public class App implements NamedElement, Visitable {
 
     public void setMessageToTranslate(String messageToTranslate) {
         this.messageToTranslate = messageToTranslate;
+    }
+
+    public List<Actuator> getMorseActuators() {
+        return morseActuators;
+    }
+
+    public void setMorseActuators(List<Actuator> morseActuators) {
+        this.morseActuators = morseActuators;
     }
 }

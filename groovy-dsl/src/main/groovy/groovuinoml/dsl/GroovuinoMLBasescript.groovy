@@ -4,6 +4,7 @@ import kernel.behavioral.Action
 import kernel.behavioral.BooleanExpression
 import kernel.behavioral.ConditionalStatement
 import kernel.behavioral.State
+import kernel.structural.Actuator
 import kernel.structural.SIGNAL
 import kernel.structural.Sensor
 
@@ -13,9 +14,14 @@ abstract class GroovuinoMLBasescript extends Script {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
 	}
 	
-	// actuator "name" pin n
-	def actuator(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createActuator(name, n) }]
+	// buzzer "name" pin n
+	def buzzer(String name) {
+		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createBuzzer(name, n) }]
+	}
+
+	// led "name" pin n
+	def led(String name) {
+		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLed(name, n) }]
 	}
 	
 	// state "name" means actuator becomes signal [and actuator becomes signal]*n
@@ -73,10 +79,16 @@ abstract class GroovuinoMLBasescript extends Script {
 
 
     def translate(String message) {
-        [into: { language ->
-            [with: { actuator ->
-                ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMorse(message)
+		List<Actuator> morseActuators = new ArrayList<>()
+
+		((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMorse(message, morseActuators)
+		[into: { language ->
+			def closure
+            [with: closure = { actuator ->
+				morseActuators.add(actuator)
+				[and: closure]
             }]
         }]
+
     }
 }

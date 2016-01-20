@@ -2,7 +2,8 @@
  * Created by Quentin on 1/14/2016.
  */
 
-actuator "buzzer" pin 8
+buzzer "buzzer" pin 12
+
 
 translate "SOS" into morse with buzzer
 

@@ -6,9 +6,7 @@ import kernel.behavioral.Action;
 import kernel.behavioral.ConditionalStatement;
 import kernel.behavioral.State;
 import kernel.behavioral.Transition;
-import kernel.structural.Actuator;
-import kernel.structural.Brick;
-import kernel.structural.Sensor;
+import kernel.structural.*;
 
 /**
  * Quick and dirty visitor to support the generation of Wiring code
@@ -68,7 +66,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 	public void visit(Actuator actuator) {
 	 	w(String.format("  pinMode(%d, OUTPUT); // %s [Actuator]", actuator.getPin(), actuator.getName()));
 	}
-
 
 	@Override
 	public void visit(Sensor sensor) {
@@ -131,25 +128,63 @@ public class ToWiring extends Visitor<StringBuffer> {
 				"int Spaces = dotLen * 3;     // length of the spaces between characters\n" +
 				"int wordPause = dotLen * 7;  // length of the pause between words");
 
-		w(String.format("void LightsOff(int delayTime)\n" +
-				"{\n" +
-				"  	noTone(8);\t       \t   \t// stop playing a tone\n" +
-				"  	delay(delayTime);            \t// hold in this position\n" +
-				"}"));
+		w("void LightsOff(int delayTime)\n" +
+				"{\n");
+		for(Actuator actuator : app.getMorseActuators()) {
+			String actuatorMethod = "";
+			String optionnalParam = "";
+			if (actuator instanceof Buzzer) {
+				actuatorMethod = "noTone";
+			} else if (actuator instanceof Led) {
+				actuatorMethod = "digitalWrite";
+				optionnalParam = ", LOW";
+
+			}
+			w(String.format("  	%s(%d%s);\t       \t   \t// stop playing a tone\n",
+					actuatorMethod, actuator.getPin(), optionnalParam));
+		}
+			w("  	delay(delayTime);            \t// hold in this position\n" +
+		"}");
 
 
 		w("void MorseDash()\n" +
-				"{\n" +
-				"  tone(8, note, dashLen);\t// start playing a tone\n" +
-				"  delay(dashLen);               // hold in this position\n" +
+				"{\n");
+		for(Actuator actuator : app.getMorseActuators()) {
+			String actuatorMethod = "";
+			String param = "";
+			if (actuator instanceof Buzzer) {
+				actuatorMethod = "tone";
+				param = "note, dashLen";
+			} else if (actuator instanceof Led) {
+				actuatorMethod = "digitalWrite";
+				param = "HIGH";
+			}
+
+			w(String.format("  	%s(%d, %s);\t// start playing a tone\n",
+					actuatorMethod, actuator.getPin(), param));
+		}
+		w("  delay(dashLen);               // hold in this position\n" +
 				"}");
 
 		w("void MorseDot()\n" +
-				"{\n" +
-				"  tone(8, note, dotLen);\t// start playing a tone\n" +
-				"  delay(dotLen);             \t// hold in this position\n" +
-				"}");
+				"{\n");
 
+		for(Actuator actuator : app.getMorseActuators()) {
+			String actuatorMethod = "";
+			String param = "";
+			if (actuator instanceof Buzzer) {
+				actuatorMethod = "tone";
+				param = "note, dotLen";
+			} else if (actuator instanceof Led) {
+				actuatorMethod = "digitalWrite";
+				param = "HIGH";
+			}
+
+			w(String.format("  	%s(%d, %s);\t// start playing a tone\n",
+					actuatorMethod, actuator.getPin(), param));
+		}
+		w("  delay(dotLen);             \t// hold in this position\n" +
+				"}");
 
 		w(" // *** Characters to Morse Code Conversion *** //\n" +
 				" void GetChar(char tmpChar) {\n" +

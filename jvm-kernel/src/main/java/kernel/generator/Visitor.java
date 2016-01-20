@@ -6,6 +6,8 @@ import kernel.behavioral.ConditionalStatement;
 import kernel.behavioral.State;
 import kernel.behavioral.Transition;
 import kernel.structural.Actuator;
+import kernel.structural.Buzzer;
+import kernel.structural.Led;
 import kernel.structural.Sensor;
 
 import java.util.HashMap;
@@ -21,6 +23,7 @@ public abstract class Visitor<T> {
 	public abstract void visit(ConditionalStatement conditionalStatement);
 
 	public abstract void visit(Actuator actuator);
+
 	public abstract void visit(Sensor sensor);
 
 	/***********************
