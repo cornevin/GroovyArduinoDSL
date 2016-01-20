@@ -7,4 +7,4 @@ buzzer "buzzer" pin 12
 
 translate "SOS" into morse with buzzer
 
-export "MorseLanguage!"
+exportMorse "MorseLanguage!"

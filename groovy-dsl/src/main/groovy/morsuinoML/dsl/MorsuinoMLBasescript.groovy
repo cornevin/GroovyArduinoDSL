@@ -1,4 +1,4 @@
-package groovuinoml.dsl
+package morsuinoML.dsl
 
 import kernel.behavioral.Action
 import kernel.behavioral.BooleanExpression
@@ -8,26 +8,26 @@ import kernel.structural.Actuator
 import kernel.structural.SIGNAL
 import kernel.structural.Sensor
 
-abstract class GroovuinoMLBasescript extends Script {
+abstract class MorsuinoMLBasescript extends Script {
 	// sensor "name" pin n
 	def sensor(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
+		[pin: { n -> ((MorsuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
 	}
 	
 	// buzzer "name" pin n
 	def buzzer(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createBuzzer(name, n) }]
+		[pin: { n -> ((MorsuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createBuzzer(name, n) }]
 	}
 
 	// led "name" pin n
 	def led(String name) {
-		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLed(name, n) }]
+		[pin: { n -> ((MorsuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createLed(name, n) }]
 	}
 	
 	// state "name" means actuator becomes signal [and actuator becomes signal]*n
 	def state(String name) {
 		List<Action> actions = new ArrayList<>()
-		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
+		((MorsuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
 		// recursive closure to allow multiple and statements
 		def closure
 		closure = { actuator -> 
@@ -44,7 +44,7 @@ abstract class GroovuinoMLBasescript extends Script {
 	
 	// initial state
 	def initial(State state) {
-		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().setInitialState(state)
+		((MorsuinoMLBinding) this.getBinding()).getGroovuinoMLModel().setInitialState(state)
 	}
 	
 	// from state1 to state2 when sensor becomes signal [and sensor2 becomes signal2]
@@ -59,10 +59,10 @@ abstract class GroovuinoMLBasescript extends Script {
 
         def closure
 		[to: { state2 ->
-            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,conditionalStatement)
+            ((MorsuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,conditionalStatement)
             [when: closure = { sensor ->
 				[becomes: { signal, bool = BooleanExpression.AND ->
-					//((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
+					//((MorsuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
                     sensors.add(sensor)
                     signals.add(signal)
 					booleanExpressions.add(bool)
@@ -74,11 +74,11 @@ abstract class GroovuinoMLBasescript extends Script {
 	
 	// export name
 	def export(String name) {
-		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
+		println(((MorsuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
 	def exportMorse(String name) {
 		//on génère une app
-		String morseApp = ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString();
+		String morseApp = ((MorsuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString();
 		export(morseApp);
 	}
 
@@ -86,7 +86,7 @@ abstract class GroovuinoMLBasescript extends Script {
     def translate(String message) {
 		List<Actuator> morseActuators = new ArrayList<>()
 
-		((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMorse(message, morseActuators)
+		((MorsuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMorse(message, morseActuators)
 		[into: { language ->
 			def closure
             [with: closure = { actuator ->
