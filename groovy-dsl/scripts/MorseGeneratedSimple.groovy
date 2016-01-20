@@ -1,17 +1,7 @@
-buzzer "buzz" pin 13
-
-state "off" means buzz becomes low
-// led becomes high
-state "onShort" means shortTime becomes high 3ms
-actionSequence "onLong" means high 6ms
-actionSequence "offLong" means low 6ms
-actionSequence "offShort" means low 3ms
-
-state "s" composedOf onShort then offShort then onShort then offShort then onShort then offShort with buzz
-state "o" composedOf onLong then offLong then onLong then offLong then onLong then offLong with buzzer
+led "led" pin 13
 
 
-state "off" means allActuators becomes low
+state "off" means led becomes low
 state "sOn1" means led becomes high
 state "sWait1" means led becomes low
 state "sOn2" means led becomes high
@@ -40,34 +30,5 @@ from OOn1 to OWait1 when 6s
 
 
 //final : on passe à off, ce qui nous fait boucler.
-
-//Lettre S
-from offlong to onShort
-from onShort to offShort
-from offShort to onShort
-from onShort to offShort
-from offShort to onShort
-from onShort to offShort
-
-from s to o
-from o to s
-
-state "shortOff" means led becomes low
-state "shortOn" means led becomes high
-from shortOn to shortOff when timer 3
-from shortOff to shortOn when timer 3
-
-composedState "s" composedOf shortOff
-
-initial s
-
-state "longOff" means led becomes low 6
-state "longOn" means led becomes high 6
-
-//when button becomes high
-from shortOn to shortOff
-from shortOff to shortOn
-
-initial shortOff //mais comment on passe à long quand on a besoin
 
 export "MultiStateAlarm!"
