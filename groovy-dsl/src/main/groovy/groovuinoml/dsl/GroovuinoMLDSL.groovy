@@ -1,6 +1,8 @@
 package groovuinoml.dsl
 
 import kernel.behavioral.BooleanExpression
+import kernel.structural.Moment
+import kernel.structural.MomentUnit
 import kernel.structural.SIGNAL
 import org.codehaus.groovy.control.CompilerConfiguration
 
@@ -22,6 +24,10 @@ class GroovuinoMLDSL {
 		binding.setVariable("low", SIGNAL.LOW)
 		binding.setVariable("and", BooleanExpression.AND)
 		binding.setVariable("or", BooleanExpression.OR)
+
+		Number.metaClass.getS = { ->
+			new Moment(delegate, MomentUnit.second)
+		}
 	}
 	
 	void eval(File scriptFile) {

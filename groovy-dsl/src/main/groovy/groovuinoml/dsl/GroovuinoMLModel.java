@@ -17,7 +17,6 @@ public class GroovuinoMLModel {
 	private List<Actuator> morseActuators;
 	private State initialState;
 	private boolean morseOn = false;
-	private String messageToTranslate;
 
 	private Binding binding;
 	
@@ -60,16 +59,23 @@ public class GroovuinoMLModel {
 		this.binding.setVariable(name, state);
 	}
 	
-	public void createTransition(State from, State to, List<BooleanExpression> booleanExpressions, List<Sensor> sensors, List<SIGNAL> signals) {
+	public void createConditionalTransition(State from, State to, List<BooleanExpression> booleanExpressions, List<Sensor> sensors, List<SIGNAL> signals) {
 		ConditionalStatement conditionalStatement = new ConditionalStatement();
 		conditionalStatement.setBooleanExpressions(booleanExpressions);
 		conditionalStatement.setSensor(sensors);
 		conditionalStatement.setValue(signals);
 
-		Transition transition = new Transition();
+		ConditionalTransition transition = new ConditionalTransition();
 		transition.setNext(to);
 		transition.setConditionalStatements(conditionalStatement);
 		from.setTransition(transition);
+	}
+
+	public void createTimerTransition(State from, State to, Moment moment) {
+		TimerTransition timerTransition = new TimerTransition();
+		timerTransition.setNext(to);
+		timerTransition.setMoment(moment);
+		from.setTransition(timerTransition);
 	}
 
 	public void setInitialState(State state) {
@@ -83,7 +89,6 @@ public class GroovuinoMLModel {
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
-		app.setMessageToTranslate(this.messageToTranslate);
 		app.setMorseMode(morseOn);
 		app.setMorseActuators(this.morseActuators);
 		Visitor codeGenerator = new ToWiring();

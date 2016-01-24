@@ -2,6 +2,7 @@ package groovuinoml.dsl
 import kernel.behavioral.Action
 import kernel.behavioral.BooleanExpression
 import kernel.behavioral.State
+import kernel.structural.Moment
 import kernel.structural.SIGNAL
 import kernel.structural.Sensor
 
@@ -52,16 +53,28 @@ abstract class GroovuinoMLBasescript extends Script {
 
         def closure
 		[to: { state2 ->
-            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2, booleanExpressions, sensors,signals)
-            [when: closure = { sensor ->
-				[becomes: { signal, bool = BooleanExpression.AND ->
-                    sensors.add(sensor)
-                    signals.add(signal)
-					booleanExpressions.add(bool)
-                    [when: closure]
-				}]
+			[when: closure = { transitionBegin ->
+				if(transitionBegin instanceof Sensor) {
+					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createConditionalTransition(state1,state2, booleanExpressions, sensors,signals)
+
+					[becomes: { signal, bool = BooleanExpression.AND ->
+						print "$signal"
+						sensors.add(transitionBegin)
+						signals.add(signal)
+						booleanExpressions.add(bool)
+						[when: closure]
+					}]
+				} else if( transitionBegin instanceof Moment) {
+					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTimerTransition(state1, state2, transitionBegin)
+				}
 			}]
+
 		}]
+	}
+
+	def when(Sensor sensor) {
+		def closure;
+
 	}
 	
 	// export name

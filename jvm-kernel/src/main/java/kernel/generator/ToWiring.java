@@ -2,10 +2,7 @@ package kernel.generator;
 
 
 import kernel.App;
-import kernel.behavioral.Action;
-import kernel.behavioral.ConditionalStatement;
-import kernel.behavioral.State;
-import kernel.behavioral.Transition;
+import kernel.behavioral.*;
 import kernel.structural.*;
 
 /**
@@ -73,6 +70,24 @@ public class ToWiring extends Visitor<StringBuffer> {
 	}
 
 	@Override
+	public void visit(ConditionalTransition conditionalTransition) {
+		w(String.format("   if("));
+		conditionalTransition.getConditionalStatements().accept(this);
+		w(String.format(" guard) {"));
+		w("    time = millis();");
+		w(String.format("    state_%s();",conditionalTransition.getNext().getName()));
+		w("  } else {");
+		w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
+		w("  }");
+	}
+
+	@Override
+	public void visit(TimerTransition timerTransition) {
+		w(String.format("delay(%d);", timerTransition.getMoment().getAmount()));
+		w(String.format("    state_%s();",timerTransition.getNext().getName()));
+	}
+
+	@Override
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
 		for(Action action: state.getActions()) {
@@ -83,18 +98,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 		state.getTransition().accept(this);
 		w("}\n");
 
-	}
-
-	@Override
-	public void visit(Transition transition) {
-        w(String.format("   if("));
-		transition.getConditionalStatements().accept(this);
-        w(String.format(" guard) {"));
-		w("    time = millis();");
-		w(String.format("    state_%s();",transition.getNext().getName()));
-		w("  } else {");
-		w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
-		w("  }");
 	}
 
 	@Override
@@ -116,8 +119,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 		w(String.format("digitalRead(%d) == %s &&",
 				conditionalStatement.getSensor().get(i).getPin(),conditionalStatement.getValue().get(i)));
-
-
 	}
 
 	private void generateMorseLanguage(App app) {
