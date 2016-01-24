@@ -6,7 +6,7 @@ state "off" means led becomes low
 
 initial off
 
-from on to off when 3.s
-from off to on when 3.s
+from on to off when button becomes high
+from off to on when button becomes high
 
 export "StateBasedAlarm!"
