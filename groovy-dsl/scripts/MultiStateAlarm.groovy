@@ -13,3 +13,8 @@ from buzzOn to ledOn when button becomes high
 from ledOn to off when button becomes high
 
 export "MultiStateAlarm!"
+
+
+state a composed onShort then offShort thn offLong with buzzer1 and buzzer2
+
+state onshort means

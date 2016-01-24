@@ -17,18 +17,18 @@ state "OWait1" means led becomes low
 initial off
 //Lettre S
 from off to sOn1
-from sOn1 to sWait1 when 3s
-from sWait1 to sOn2 when 3s
-from sOn2 to sWait2 when 3s
-from sWait2 to sOn3 when 3s
+from sOn1 to sWait1 until 3s
+from sWait1 to sOn2 until 3s
+from sOn2 to sWait2 until 3s
+from sWait2 to sOn3 until 3s
 
 //fin de la lettre S
-from sOn3 to sOff1 when 3s
-//Début de la lettre 0
-from sOff1 to OOn1 when 3s
-from OOn1 to OWait1 when 6s
+from sOn3 to sOff1 until 3s
+//Dï¿½but de la lettre 0
+from sOff1 to OOn1 until 3s
+from OOn1 to OWait1 until 6s
 
 
-//final : on passe à off, ce qui nous fait boucler.
+//final : on passe ï¿½ off, ce qui nous fait boucler.
 
 export "MultiStateAlarm!"

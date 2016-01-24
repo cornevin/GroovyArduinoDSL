@@ -8,6 +8,4 @@ buzzer "otherBuzz" pin 3
 
 
 
-translate "SOS"
-
 export "MorseLanguage!"

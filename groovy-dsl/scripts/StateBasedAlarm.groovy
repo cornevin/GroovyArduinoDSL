@@ -1,7 +1,7 @@
 sensor "button" pin 9
-actuator "led" pin 12
+led "led" pin 12
 
-state "on" means led becomes high
+state "on" means led becomes high and led becomes low and led becomes high
 state "off" means led becomes low
 
 initial off

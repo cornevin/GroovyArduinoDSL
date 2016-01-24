@@ -1,10 +1,7 @@
 package groovuinoml.dsl
-
 import kernel.behavioral.Action
 import kernel.behavioral.BooleanExpression
-import kernel.behavioral.ConditionalStatement
 import kernel.behavioral.State
-import kernel.structural.Actuator
 import kernel.structural.SIGNAL
 import kernel.structural.Sensor
 
@@ -52,17 +49,12 @@ abstract class GroovuinoMLBasescript extends Script {
         List<Sensor> sensors = new ArrayList<>()
         List<SIGNAL> signals = new ArrayList<>()
 		List<BooleanExpression> booleanExpressions = new ArrayList<>()
-		ConditionalStatement conditionalStatement = new ConditionalStatement()
-        conditionalStatement.setBooleanExpressions(booleanExpressions)
-        conditionalStatement.setSensor(sensors)
-        conditionalStatement.setValue(signals)
 
         def closure
 		[to: { state2 ->
-            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2,conditionalStatement)
+            ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1,state2, booleanExpressions, sensors,signals)
             [when: closure = { sensor ->
 				[becomes: { signal, bool = BooleanExpression.AND ->
-					//((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTransition(state1, state2, sensor, signal)
                     sensors.add(sensor)
                     signals.add(signal)
 					booleanExpressions.add(bool)
@@ -76,24 +68,4 @@ abstract class GroovuinoMLBasescript extends Script {
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
-	def exportMorse(String name) {
-		//on génère une app
-		String morseApp = ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString();
-		export(morseApp);
-	}
-
-
-    def translate(String message) {
-		List<Actuator> morseActuators = new ArrayList<>()
-
-		((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMorse(message, morseActuators)
-		[into: { language ->
-			def closure
-            [with: closure = { actuator ->
-				morseActuators.add(actuator)
-				[and: closure]
-            }]
-        }]
-
-    }
 }

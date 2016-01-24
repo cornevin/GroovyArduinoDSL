@@ -2,10 +2,7 @@ package groovuinoml.dsl;
 
 import groovy.lang.Binding;
 import kernel.App;
-import kernel.behavioral.Action;
-import kernel.behavioral.ConditionalStatement;
-import kernel.behavioral.State;
-import kernel.behavioral.Transition;
+import kernel.behavioral.*;
 import kernel.generator.ToWiring;
 import kernel.generator.Visitor;
 import kernel.structural.*;
@@ -63,19 +60,18 @@ public class GroovuinoMLModel {
 		this.binding.setVariable(name, state);
 	}
 	
-	public void createTransition(State from, State to, ConditionalStatement conditionalStatement) {
+	public void createTransition(State from, State to, List<BooleanExpression> booleanExpressions, List<Sensor> sensors, List<SIGNAL> signals) {
+		ConditionalStatement conditionalStatement = new ConditionalStatement();
+		conditionalStatement.setBooleanExpressions(booleanExpressions);
+		conditionalStatement.setSensor(sensors);
+		conditionalStatement.setValue(signals);
+
 		Transition transition = new Transition();
 		transition.setNext(to);
 		transition.setConditionalStatements(conditionalStatement);
 		from.setTransition(transition);
 	}
 
-	public void createMorse(String message, List<Actuator> morseActuators) {
-		this.morseActuators = morseActuators;
-		this.morseOn = true;
-		this.messageToTranslate = message;
-	}
-	
 	public void setInitialState(State state) {
 		this.initialState = state;
 	}

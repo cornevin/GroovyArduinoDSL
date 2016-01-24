@@ -17,7 +17,7 @@ class GroovuinoMLDSL {
 		configuration = new CompilerConfiguration()
 		configuration.setScriptBaseClass("groovuinoml.dsl.GroovuinoMLBasescript")
 		shell = new GroovyShell(configuration)
-		
+
 		binding.setVariable("high", SIGNAL.HIGH)
 		binding.setVariable("low", SIGNAL.LOW)
 		binding.setVariable("and", BooleanExpression.AND)
