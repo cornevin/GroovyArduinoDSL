@@ -29,7 +29,7 @@ public class MorsuinoMLBinding extends Binding {
 		this.script = script;
 	}
 
-	public void setGroovuinoMLModel(MorsuinoMLModel model) {
+	public void setMorsuinoMLModel(MorsuinoMLModel model) {
 		this.model = model;
 	}
 
@@ -47,7 +47,7 @@ public class MorsuinoMLBinding extends Binding {
 		super.setVariable(name, value);
 	}
 
-	public MorsuinoMLModel getGroovuinoMLModel() {
+	public MorsuinoMLModel getMorsuinoMLModel() {
 		return this.model;
 	}
 }

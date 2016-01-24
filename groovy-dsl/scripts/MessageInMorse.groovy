@@ -3,8 +3,11 @@
  */
 
 buzzer "buzzer" pin 12
+led "myLed" pin 9
+buzzer "otherBuzz" pin 3
 
 
-translate "SOS" into morse with buzzer
 
-exportMorse "MorseLanguage!"
+translate "SOS"
+
+export "MorseLanguage!"

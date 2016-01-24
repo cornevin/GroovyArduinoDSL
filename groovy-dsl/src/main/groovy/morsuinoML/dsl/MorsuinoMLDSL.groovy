@@ -12,9 +12,9 @@ class MorsuinoMLDSL {
 
 	MorsuinoMLDSL() {
 		binding = new MorsuinoMLBinding()
-		binding.setGroovuinoMLModel(new MorsuinoMLModel(binding));
+		binding.setMorsuinoMLModel(new MorsuinoMLModel(binding));
 		configuration = new CompilerConfiguration()
-		configuration.setScriptBaseClass("groovuinoml.dsl.MorsuinoMLBasescript")
+		configuration.setScriptBaseClass("morsuinoML.dsl.MorsuinoMLBasescript")
 		shell = new GroovyShell(configuration)
 		
 		binding.setVariable("high", SIGNAL.HIGH)
