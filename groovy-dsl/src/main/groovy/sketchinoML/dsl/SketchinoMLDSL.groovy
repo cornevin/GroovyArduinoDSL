@@ -12,7 +12,7 @@ class SketchinoMLDSL {
 		binding = new SketchinoMLBinding()
 		binding.setSketchinoMLModel(new SketchinoMLModel(binding));
 		configuration = new CompilerConfiguration()
-		configuration.setScriptBaseClass("sketchinoML.dsl.sketchinoMLBasescript")
+		configuration.setScriptBaseClass("sketchinoML.dsl.SketchinoMLBasescript")
 		shell = new GroovyShell(configuration)
 
 	}

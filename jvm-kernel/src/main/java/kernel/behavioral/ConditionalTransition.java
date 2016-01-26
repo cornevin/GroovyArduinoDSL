@@ -21,4 +21,20 @@ public class ConditionalTransition extends Transition {
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConditionalTransition)) return false;
+
+        ConditionalTransition that = (ConditionalTransition) o;
+
+        return conditionalStatement.equals(that.conditionalStatement);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return conditionalStatement.hashCode();
+    }
 }
