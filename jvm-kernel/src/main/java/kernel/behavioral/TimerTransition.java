@@ -22,4 +22,20 @@ public class TimerTransition extends Transition {
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TimerTransition)) return false;
+
+        TimerTransition that = (TimerTransition) o;
+
+        return moment.equals(that.moment);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return moment.hashCode();
+    }
 }

@@ -16,6 +16,6 @@ import java.io.File;
 public class SketchinoML {
 	public static void main(String[] args) {
 		SketchinoMLDSL dsl = new SketchinoMLDSL();
-		dsl.eval(new File("groovy-dsl/scripts/MessageInMorse.groovy"));
+		dsl.eval(new File("groovy-dsl/scripts/SketchComposition.groovy"));
 	}
 }

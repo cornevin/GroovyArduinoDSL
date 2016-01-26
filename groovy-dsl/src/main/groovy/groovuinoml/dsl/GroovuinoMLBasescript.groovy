@@ -76,4 +76,8 @@ abstract class GroovuinoMLBasescript extends Script {
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
+
+	def exportToCompose(String name) {
+		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString()
+	}
 }

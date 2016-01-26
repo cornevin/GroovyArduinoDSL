@@ -6,6 +6,7 @@ import kernel.behavioral.*;
 import kernel.generator.ToWiring;
 import kernel.generator.Visitor;
 import kernel.structural.*;
+import sketchinoML.dsl.SketchinoMLModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +16,14 @@ public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
 	private State initialState;
+	private App app;
 
 	private Binding binding;
 	
 	public GroovuinoMLModel(Binding binding) {
 		this.bricks = new ArrayList<Brick>();
 		this.states = new ArrayList<State>();
+		app = new App();
 		this.binding = binding;
 	}
 	
@@ -81,14 +84,17 @@ public class GroovuinoMLModel {
 	
 	@SuppressWarnings("rawtypes")
 	public Object generateCode(String appName) {
-		App app = new App();
 		app.setName(appName);
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
-		
+		SketchinoMLModel.addApp(app);
 		return codeGenerator.getResult();
+	}
+
+	public App getApp() {
+		return app;
 	}
 }

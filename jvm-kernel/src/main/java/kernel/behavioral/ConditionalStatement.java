@@ -48,4 +48,25 @@ public class ConditionalStatement implements Visitable {
     public void accept(Visitor visitor) {
             visitor.visit(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConditionalStatement)) return false;
+
+        ConditionalStatement that = (ConditionalStatement) o;
+
+        if (!sensor.equals(that.sensor)) return false;
+        if (!value.equals(that.value)) return false;
+        return booleanExpressions.equals(that.booleanExpressions);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sensor.hashCode();
+        result = 31 * result + value.hashCode();
+        result = 31 * result + booleanExpressions.hashCode();
+        return result;
+    }
 }

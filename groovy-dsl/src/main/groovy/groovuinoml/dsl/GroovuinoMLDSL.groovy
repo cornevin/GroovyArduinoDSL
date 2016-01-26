@@ -11,8 +11,7 @@ class GroovuinoMLDSL {
 	private GroovyShell shell
 	private CompilerConfiguration configuration
 	private GroovuinoMLBinding binding
-	private GroovuinoMLBasescript basescript
-	
+
 	GroovuinoMLDSL() {
 		binding = new GroovuinoMLBinding()
 		binding.setGroovuinoMLModel(new GroovuinoMLModel(binding));
@@ -45,11 +44,11 @@ class GroovuinoMLDSL {
 		script.run()
 	}
 
-	GroovuinoMLModel generateModel(File scriptFile) {
+	void generateModel(File scriptFile) {
 		Script script = shell.parse(scriptFile)
 
 		binding.setScript(script)
 		script.setBinding(binding)
-		return binding.getGroovuinoMLModel()
+		script.run()
 	}
 }
