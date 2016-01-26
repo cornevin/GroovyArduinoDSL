@@ -1,47 +1,48 @@
-package groovuinoml.dsl;
+package sketchinoML.dsl;
 
 import groovy.lang.Binding;
 import groovy.lang.Script;
+import morsuinoML.dsl.MorsuinoMLModel;
 
 import java.util.Map;
 
-public class GroovuinoMLBinding extends Binding {
+public class SketchinoMLBinding extends Binding {
 	// can be useful to return the script in case of syntax trick
 	private Script script;
-	
-	private GroovuinoMLModel model;
-	
-	public GroovuinoMLBinding() {
+
+	private MorsuinoMLModel model;
+
+	public SketchinoMLBinding() {
 		super();
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	public GroovuinoMLBinding(Map variables) {
+	public SketchinoMLBinding(Map variables) {
 		super(variables);
 	}
-	
-	public GroovuinoMLBinding(Script script) {
+
+	public SketchinoMLBinding(Script script) {
 		super();
 		this.script = script;
 	}
-	
+
 	public void setScript(Script script) {
 		this.script = script;
 	}
-	
-	public void setGroovuinoMLModel(GroovuinoMLModel model) {
+
+	public void setMorsuinoMLModel(MorsuinoMLModel model) {
 		this.model = model;
 	}
-	
+
 	public Object getVariable(String name) {
 		return super.getVariable(name);
 	}
-	
+
 	public void setVariable(String name, Object value) {
 		super.setVariable(name, value);
 	}
-	
-	public GroovuinoMLModel getGroovuinoMLModel() {
+
+	public MorsuinoMLModel getMorsuinoMLModel() {
 		return this.model;
 	}
 }

@@ -28,6 +28,12 @@ class GroovuinoMLDSL {
 		Number.metaClass.getS = { ->
 			new Moment(delegate, MomentUnit.second)
 		}
+		Number.metaClass.getM = { ->
+			new Moment(delegate, MomentUnit.minut)
+		}
+		Number.metaClass.getH = { ->
+			new Moment(delegate, MomentUnit.hour)
+		}
 	}
 	
 	void eval(File scriptFile) {
@@ -37,5 +43,13 @@ class GroovuinoMLDSL {
 		script.setBinding(binding)
 		
 		script.run()
+	}
+
+	GroovuinoMLModel generateModel(File scriptFile) {
+		Script script = shell.parse(scriptFile)
+
+		binding.setScript(script)
+		script.setBinding(binding)
+		return binding.getGroovuinoMLModel()
 	}
 }

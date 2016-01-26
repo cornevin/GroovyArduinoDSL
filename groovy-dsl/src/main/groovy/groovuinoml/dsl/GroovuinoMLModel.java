@@ -96,4 +96,28 @@ public class GroovuinoMLModel {
 		
 		return codeGenerator.getResult();
 	}
+
+	public List<Brick> getBricks() {
+		return bricks;
+	}
+
+	public List<State> getStates() {
+		return states;
+	}
+
+	public List<Actuator> getMorseActuators() {
+		return morseActuators;
+	}
+
+	public State getInitialState() {
+		return initialState;
+	}
+
+	public boolean isMorseOn() {
+		return morseOn;
+	}
+
+	public Binding getBinding() {
+		return binding;
+	}
 }

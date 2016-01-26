@@ -1,7 +1,6 @@
 /**
  * Created by Quentin on 1/12/2016.
  */
-
 sensor "button1" pin 8
 sensor "button2" pin 9
 buzzer "buzzer" pin 12

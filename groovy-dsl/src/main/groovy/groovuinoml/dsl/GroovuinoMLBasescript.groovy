@@ -72,13 +72,17 @@ abstract class GroovuinoMLBasescript extends Script {
 		}]
 	}
 
-	def when(Sensor sensor) {
-		def closure;
-
-	}
-	
 	// export name
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
+	}
+
+	def app(String name) {
+		String fileContents = new File(name).text
+
+	}
+
+	def define(String name) {
+
 	}
 }
