@@ -14,9 +14,7 @@ import java.util.List;
 public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
-	private List<Actuator> morseActuators;
 	private State initialState;
-	private boolean morseOn = false;
 
 	private Binding binding;
 	
@@ -32,7 +30,6 @@ public class GroovuinoMLModel {
 		sensor.setPin(pinNumber);
 		this.bricks.add(sensor);
 		this.binding.setVariable(name, sensor);
-//		System.out.println("> sensor " + name + " on pin " + pinNumber);
 	}
 	
 	public void createBuzzer(String name, Integer pinNumber) {
@@ -89,8 +86,6 @@ public class GroovuinoMLModel {
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
-		app.setMorseMode(morseOn);
-		app.setMorseActuators(this.morseActuators);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
 		
