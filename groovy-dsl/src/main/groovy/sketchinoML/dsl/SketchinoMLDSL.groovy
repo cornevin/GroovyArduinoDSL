@@ -1,21 +1,18 @@
 package sketchinoML.dsl
 
-import morsuinoML.dsl.MorsuinoMLBasescript
-import morsuinoML.dsl.MorsuinoMLBinding
-import morsuinoML.dsl.MorsuinoMLModel
 import org.codehaus.groovy.control.CompilerConfiguration
 
 class SketchinoMLDSL {
 	private GroovyShell shell
 	private CompilerConfiguration configuration
-	private MorsuinoMLBinding binding
-	private MorsuinoMLBasescript basescript
+	private SketchinoMLBinding binding
+	private SketchinoMLBasescript basescript
 
 	SketchinoMLDSL() {
-		binding = new MorsuinoMLBinding()
-		binding.setMorsuinoMLModel(new MorsuinoMLModel(binding));
+		binding = new SketchinoMLBinding()
+		binding.setSketchinoMLModel(new SketchinoMLModel(binding));
 		configuration = new CompilerConfiguration()
-		configuration.setScriptBaseClass("morsuinoML.dsl.MorsuinoMLBasescript")
+		configuration.setScriptBaseClass("sketchinoML.dsl.sketchinoMLBasescript")
 		shell = new GroovyShell(configuration)
 
 	}

@@ -2,7 +2,6 @@ package sketchinoML.dsl;
 
 import groovy.lang.Binding;
 import groovy.lang.Script;
-import morsuinoML.dsl.MorsuinoMLModel;
 
 import java.util.Map;
 
@@ -10,7 +9,7 @@ public class SketchinoMLBinding extends Binding {
 	// can be useful to return the script in case of syntax trick
 	private Script script;
 
-	private MorsuinoMLModel model;
+	private SketchinoMLModel model;
 
 	public SketchinoMLBinding() {
 		super();
@@ -30,7 +29,7 @@ public class SketchinoMLBinding extends Binding {
 		this.script = script;
 	}
 
-	public void setMorsuinoMLModel(MorsuinoMLModel model) {
+	public void setSketchinoMLModel(SketchinoMLModel model) {
 		this.model = model;
 	}
 
@@ -42,7 +41,7 @@ public class SketchinoMLBinding extends Binding {
 		super.setVariable(name, value);
 	}
 
-	public MorsuinoMLModel getMorsuinoMLModel() {
+	public SketchinoMLModel getSketchinoMLModel() {
 		return this.model;
 	}
 }
