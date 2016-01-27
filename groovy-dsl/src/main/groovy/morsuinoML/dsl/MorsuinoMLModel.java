@@ -127,12 +127,12 @@ public class MorsuinoMLModel {
         MorsuinoMLState shortOn4 = new MorsuinoMLState("shorton4", SHORT, true);
         MorsuinoMLState shortOff4 = new MorsuinoMLState("shortoff4", SHORT, false);
 
-        MorsuinoMLState longOn1 = new MorsuinoMLState("longon1", LONG, true);
-        MorsuinoMLState longOff1 = new MorsuinoMLState("longoff1", SHORT, false);
-        MorsuinoMLState longOn2 = new MorsuinoMLState("longon2", LONG, true);
-        MorsuinoMLState longOff2 = new MorsuinoMLState("longoff2", SHORT, false);
-        MorsuinoMLState longOn3 = new MorsuinoMLState("longon3", LONG, true);
-        MorsuinoMLState longOff3 = new MorsuinoMLState("longoff3", SHORT, false);
+        MorsuinoMLState longOn1 = new MorsuinoMLState("longon1", SHORT, true);
+        MorsuinoMLState longOff1 = new MorsuinoMLState("longoff1", LONG, false);
+        MorsuinoMLState longOn2 = new MorsuinoMLState("longon2", SHORT, true);
+        MorsuinoMLState longOff2 = new MorsuinoMLState("longoff2", LONG, false);
+        MorsuinoMLState longOn3 = new MorsuinoMLState("longon3", SHORT, true);
+        MorsuinoMLState longOff3 = new MorsuinoMLState("longoff3", LONG, false);
 
         MorsuinoMLState silence = new MorsuinoMLState("finMot", SUPERLONG, false);
         MorsuinoMLLetter space = new MorsuinoMLLetter();
