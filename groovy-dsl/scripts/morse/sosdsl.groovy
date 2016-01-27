@@ -98,4 +98,4 @@ from Lshorton36 to Lshortoff36 when 1.s
 from Lshortoff36 to finLettre6 when 3.s
 from finLettre6 to off when 1.s
 
-export "sosdsl"
+exportToCompose "sosdsl"

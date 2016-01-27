@@ -48,6 +48,24 @@ public class SketchinoMLModel {
             for(State newState : app.getStates()) {
                 for(State actualState : this.states) {
                     if((newState.getTransition() instanceof TimerTransition) && actualState.getTransition() instanceof TimerTransition) {
+                        composedOk = true;
+                        if(((TimerTransition) newState.getTransition()).getMoment().getAmount() == ((TimerTransition) actualState.getTransition()).getMoment().getAmount()) {
+                            boolean addAction = false;
+                            for(Action newAction :  newState.getActions() ) {
+                                for(Action actualAction : actualState.getActions()) {
+                                    if(newAction.getValue().equals(actualAction.getValue())) {
+                                        addAction = true;
+                                    }
+                                }
+                                if(addAction) {
+                                    for(Action action : newState.getActions()) {
+                                        actualState.getActions().add(action);
+                                    }
+                                }
+                            }
+
+                        }
+
 
                     } else if(newState.getTransition() instanceof ConditionalTransition && (actualState.getTransition() instanceof ConditionalTransition)
                             && actualState.getName().equals(newState.getName())) {
