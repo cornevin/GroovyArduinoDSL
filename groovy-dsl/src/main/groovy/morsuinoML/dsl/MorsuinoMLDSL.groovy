@@ -1,7 +1,5 @@
 package morsuinoML.dsl
 
-import kernel.behavioral.BooleanExpression
-import kernel.structural.SIGNAL
 import org.codehaus.groovy.control.CompilerConfiguration
 
 class MorsuinoMLDSL {
@@ -16,10 +14,7 @@ class MorsuinoMLDSL {
 		configuration = new CompilerConfiguration()
 		configuration.setScriptBaseClass("morsuinoML.dsl.MorsuinoMLBasescript")
 		shell = new GroovyShell(configuration)
-		
-		binding.setVariable("high", SIGNAL.HIGH)
-		binding.setVariable("low", SIGNAL.LOW)
-		binding.setVariable("and", BooleanExpression.AND)
+
 	}
 	
 	void eval(File scriptFile) {

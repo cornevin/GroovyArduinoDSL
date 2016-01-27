@@ -24,12 +24,12 @@ from sWait2 to sOn3 when 3.s
 
 //fin de la lettre S
 from sOn3 to sOff1 when 3.s
-//D�but de la lettre 0
+//Début de la lettre 0
 from sOff1 to OOn1 when 3.s
 from OOn1 to OWait1 when 6.s
 
 from OWait1 to off when 3.s
 
-//final : on passe � off, ce qui nous fait boucler.
+//final : on passe à off, ce qui nous fait boucler.
 
 export "MultiStateAlarm!"
