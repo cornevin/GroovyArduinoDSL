@@ -29,6 +29,6 @@ abstract class MorsuinoMLBasescript extends Script {
 
 	// export name
 	def export(String name) {
-		println(((MorsuinoMLBinding) this.getBinding()).getMorsuinoMLModel().generateCode(name).toString())
+		((MorsuinoMLBinding) this.getBinding()).getMorsuinoMLModel().generateCode(name)
 	}
 }

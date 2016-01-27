@@ -1,7 +1,11 @@
 package morsuinoML.dsl;
 
+import groovuinoml.main.GroovuinoML;
 import groovy.lang.Binding;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,7 @@ public class MorsuinoMLModel {
 
 
     @SuppressWarnings("rawtypes")
-    public Object generateCode(String appName) {
+    public Object generateCode(String appName) throws FileNotFoundException, UnsupportedEncodingException {
         //MorsuinoML ne touche pas au code JAVA (kernel) parce qu'il ne veut pas générer ce que
         //ce code permet de générer. Il touche éventuellement à groovuinoML par contre. mais éventuellement.
         String groovuinoMLApp = "";
@@ -46,7 +50,12 @@ public class MorsuinoMLModel {
         //states
         groovuinoMLApp += "\n" + transitionDeclaration + "\n";
         groovuinoMLApp += "\nexport \"" + appName + "\"\n";
-
+        PrintWriter writer = new PrintWriter("./groovy-dsl/scripts/morse/"+appName+".groovy", "UTF-8");
+        writer.println(groovuinoMLApp);
+        writer.close();
+        String[] args = new String[1];
+        args[0] = "groovy-dsl/scripts/morse/"+appName+".groovy";
+        GroovuinoML.main(args);
         return groovuinoMLApp;
     }
 
