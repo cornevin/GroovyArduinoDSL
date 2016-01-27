@@ -86,7 +86,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 	@Override
 	public void visit(Action action) {
 		if(action.getActuator() instanceof Buzzer) {
-			w(String.format("	tone(%d,1200,100);", action.getActuator().getPin()));
+			if(action.getValue().equals(SIGNAL.HIGH)) {
+				w(String.format("	tone(%d,1200,100);", action.getActuator().getPin()));
+			} else {
+				w(String.format("	noTone(%d);", action.getActuator().getPin()));
+			}
 		} else {
 			w(String.format("	digitalWrite(%d,%s);",action.getActuator().getPin(),action.getValue()));
 		}
