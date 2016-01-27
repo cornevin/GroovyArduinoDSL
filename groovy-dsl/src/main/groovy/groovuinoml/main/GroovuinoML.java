@@ -17,7 +17,7 @@ public class GroovuinoML {
 	public static void main(String[] args) {
 		GroovuinoMLDSL dsl = new GroovuinoMLDSL();
 		//dsl.eval(new File("groovy-dsl/scripts/morse/SOSBUZZER.groovy"));
-		dsl.eval(new File("groovy-dsl/scripts/morse/SOSBUZZER.groovy"));
+		dsl.eval(new File("groovy-dsl/scripts/morse/sosdsl.groovy"));
 
 	}
 }
