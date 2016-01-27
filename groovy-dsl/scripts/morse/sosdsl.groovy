@@ -23,7 +23,7 @@ state "Sshortoff22" means myLed becomes low and buzzer becomes low
 state "Sshorton32" means myLed becomes high and buzzer becomes high
 state "Sshortoff32" means myLed becomes low and buzzer becomes low
 state "finLettre2" means myLed becomes low and buzzer becomes low
-state "finMot3" means myLed becomes low and buzzer becomes low
+state "spacefinMot3" means myLed becomes low and buzzer becomes low
 state "finLettre3" means myLed becomes low and buzzer becomes low
 state "Dlongon14" means myLed becomes high and buzzer becomes high
 state "Dlongoff14" means myLed becomes low and buzzer becomes low
@@ -71,8 +71,8 @@ from Sshorton22 to Sshortoff22 when 1.s
 from Sshortoff22 to Sshorton32 when 1.s
 from Sshorton32 to Sshortoff32 when 1.s
 from Sshortoff32 to finLettre2 when 3.s
-from finLettre2 to  finMot3 when 7.s
-from  finMot3 to finLettre3 when 3.s
+from finLettre2 to spacefinMot3 when 7.s
+from spacefinMot3 to finLettre3 when 3.s
 from finLettre3 to Dlongon14 when 1.s
 from Dlongon14 to Dlongoff14 when 3.s
 from Dlongoff14 to Dshorton14 when 1.s
