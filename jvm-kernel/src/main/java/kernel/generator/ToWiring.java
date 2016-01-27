@@ -25,7 +25,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("// Wiring code generated from an ArduinoML model");
 		w(String.format("// Application name: %s\n", app.getName()));
 
-		w(String.format("char stringToMorseCode[] = \"%s\";\n", app.getMessageToTranslate()));
 		w("void setup(){");
 		for(Brick brick: app.getBricks()){
 			brick.accept(this);
@@ -87,7 +86,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 	@Override
 	public void visit(Action action) {
 		if(action.getActuator() instanceof Buzzer) {
-			w(String.format("	tone(%d,1200,100)", action.getActuator().getPin()));
+			w(String.format("	tone(%d,1200,100);", action.getActuator().getPin()));
 		} else {
 			w(String.format("	digitalWrite(%d,%s);",action.getActuator().getPin(),action.getValue()));
 		}
