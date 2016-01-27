@@ -32,4 +32,4 @@ from OWait1 to off when 3.s
 
 //final : on passe à off, ce qui nous fait boucler.
 
-export "MultiStateAlarm!"
+export "MorseSimple"
