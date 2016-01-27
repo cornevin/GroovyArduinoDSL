@@ -92,7 +92,10 @@ public class MorsuinoMLModel {
         // for (int i = 0 ; i<1 ; i++) {
         for (int i = 0; i < letters.length; i++) {
             MorsuinoMLLetter currL = alphabet.getLetters().get(letters[i].toUpperCase());
-
+            if (currL == null) {
+                currL = alphabet.getLetters().get("space");
+                letters[i] = "space";
+            }
             for (MorsuinoMLState currState : currL.getStatesList()) {
                 states.add(new MorsuinoMLState(letters[i] + currState.getBaseStateName() + i, currState.getBaseDuration(), currState.isHigh()));
                 statesDeclaration += "\nstate \"" + letters[i] + currState.getBaseStateName() + i + "\" means ";
@@ -137,7 +140,7 @@ public class MorsuinoMLModel {
         MorsuinoMLState silence = new MorsuinoMLState("finMot", SUPERLONG, false);
         MorsuinoMLLetter space = new MorsuinoMLLetter();
         space.addState(silence);
-        alphabet.addLetter(" ", space);
+        alphabet.addLetter("space", space);
         MorsuinoMLLetter a = new MorsuinoMLLetter();
         a.addState(shortOn1);
         a.addState(shortOff1);
