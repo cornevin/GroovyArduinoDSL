@@ -66,7 +66,7 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 	@Override
 	public void visit(TimerTransition timerTransition) {
-		w(String.format("delay(%d);", timerTransition.getMoment().getAmount()));
+		w(String.format("delay(%d);", timerTransition.getMoment().getAmount() * 100));
 		w(String.format("    state_%s();",timerTransition.getNext().getName()));
 	}
 
@@ -74,7 +74,13 @@ public class ToWiring extends Visitor<StringBuffer> {
 	public void visit(State state) {
 		w(String.format("void state_%s() {",state.getName()));
 		for(Action action: state.getActions()) {
-			action.accept(this);
+			if((state.getTransition() instanceof TimerTransition) &&(action.getActuator() instanceof Buzzer) &&
+					(action.getValue().equals(SIGNAL.HIGH))) {
+				int amount = ((TimerTransition) state.getTransition()).getMoment().getAmount();
+				w(String.format("	tone(%d,1200,%d);", action.getActuator().getPin(), amount * 100));
+			} else {
+				action.accept(this);
+			}
 		}
 		w("  boolean guard = millis() - time > debounce;");
 		context.put(CURRENT_STATE, state);
