@@ -39,24 +39,24 @@ public class MorsuinoMLModel {
         //	App app = new App();
         //	app.setName(appName);
         for (String actuatorDeclaration : actuatorDeclarations) {
-            groovuinoMLApp += "\n"+actuatorDeclaration;
+            groovuinoMLApp += "\n" + actuatorDeclaration;
         }
-        groovuinoMLApp += "\n"+ statesDeclaration + "\n";
+        groovuinoMLApp += "\n" + statesDeclaration + "\n";
 
         //states
-        groovuinoMLApp +=  "\n"+ transitionDeclaration + "\n";
-        groovuinoMLApp += "\nexport \""+appName+"\"\n";
+        groovuinoMLApp += "\n" + transitionDeclaration + "\n";
+        groovuinoMLApp += "\nexport \"" + appName + "\"\n";
 
         return groovuinoMLApp;
     }
 
     private String setInitialState() {
         //morseActuators contient la liste des noms des actuators, sur lesquels je vais définir les états
-        String initialState =  "state \"off\" means ";
+        String initialState = "state \"off\" means ";
         states.add(new MorsuinoMLState("off", SHORT, false));
         //TODO: la def de lowEOS et highEOS n'ont rien a faire la dedans
-        lowEOS =  morseActuators.get(0) + " becomes low";
-        highEOS =  morseActuators.get(0) + " becomes high";
+        lowEOS = morseActuators.get(0) + " becomes low";
+        highEOS = morseActuators.get(0) + " becomes high";
         if (morseActuators.size() > 1) {
             for (int actus = 1; actus < morseActuators.size(); actus++) {
                 lowEOS += " and " + morseActuators.get(actus) + " becomes low";
@@ -66,6 +66,7 @@ public class MorsuinoMLModel {
         initialState += lowEOS + "\ninitial off";//TODO: not sure it goes here
         return initialState;
     }
+
     /**
      * This methods allows us to keep the actuator's name for future reference
      *
@@ -88,57 +89,55 @@ public class MorsuinoMLModel {
         statesDeclaration += setInitialState();
 
         //Pour chaque lettre du mot, je dois définir une liste d'états, avec leur nom, et aussi aller chercher dans une map correspondante.
-       // for (int i = 0 ; i<1 ; i++) {
-        for (int i = 0 ; i<letters.length ; i++) {
+        // for (int i = 0 ; i<1 ; i++) {
+        for (int i = 0; i < letters.length; i++) {
             MorsuinoMLLetter currL = alphabet.getLetters().get(letters[i].toUpperCase());
-            if (letters[i] == " ") {
-                states.add(new MorsuinoMLState("finMot" + i, SUPERLONG, false));
-                statesDeclaration += "\nstate \"finMot" + i + "\" means " + lowEOS;
+
+            for (MorsuinoMLState currState : currL.getStatesList()) {
+                states.add(new MorsuinoMLState(letters[i] + currState.getBaseStateName() + i, currState.getBaseDuration(), currState.isHigh()));
+                statesDeclaration += "\nstate \"" + letters[i] + currState.getBaseStateName() + i + "\" means ";
+                if (currState.isHigh()) statesDeclaration += highEOS;
+                else statesDeclaration += lowEOS;
             }
-            else {
-                for (MorsuinoMLState currState : currL.getStatesList()) {
-                    states.add(new MorsuinoMLState(letters[i] + currState.getBaseStateName() + i, currState.getBaseDuration(), currState.isHigh()));
-                    statesDeclaration += "\nstate \"" + letters[i] + currState.getBaseStateName() + i + "\" means ";
-                    if (currState.isHigh()) statesDeclaration += highEOS;
-                    else statesDeclaration += lowEOS;
-                }
-                //Once we have finished the description of a letter's different states, we must add a transition that will allow us to jump to the other state
-                states.add(new MorsuinoMLState("finLettre" + i, LONG, false));
-                statesDeclaration += "\nstate \"finLettre" + i + "\" means " + lowEOS;
-            }
+            //Once we have finished the description of a letter's different states, we must add a transition that will allow us to jump to the other state
+            states.add(new MorsuinoMLState("finLettre" + i, LONG, false));
+            statesDeclaration += "\nstate \"finLettre" + i + "\" means " + lowEOS;
+
         }
 
         transitionDeclaration = "";
         //For each state we have declared, we must now set the transitions.
         //It should be easy because it should be in order
         int i;
-        for (i = 0 ; i < states.size()-1 ; i++) {
+        for (i = 0; i < states.size() - 1; i++) {
             transitionDeclaration += "\nfrom " + states.get(i).getBaseStateName() + " to " +
-                    states.get(i+1).getBaseStateName() + " when " +  states.get(i+1).getBaseDuration();
+                    states.get(i + 1).getBaseStateName() + " when " + states.get(i + 1).getBaseDuration();
         }
         transitionDeclaration += "\nfrom " + states.get(i).getBaseStateName() + " to " +
-                states.get(0).getBaseStateName() + " when " +  states.get(0).getBaseDuration();
+                states.get(0).getBaseStateName() + " when " + states.get(0).getBaseDuration();
     }
 
     private void fillAlphabet() {
-        MorsuinoMLState shortOn1 = new MorsuinoMLState("on1", SHORT, true);
-        MorsuinoMLState shortOff1 = new MorsuinoMLState("off1", SHORT, false);
-        MorsuinoMLState shortOn2 = new MorsuinoMLState("on2", SHORT, true);
-        MorsuinoMLState shortOff2 = new MorsuinoMLState("off2", SHORT, false);
-        MorsuinoMLState shortOn3 = new MorsuinoMLState("on3", SHORT, true);
-        MorsuinoMLState shortOff3 = new MorsuinoMLState("off3", SHORT, false);
-        MorsuinoMLState shortOn4 = new MorsuinoMLState("on4", SHORT, true);
-        MorsuinoMLState shortOff4 = new MorsuinoMLState("off4", SHORT, false);
+        MorsuinoMLState shortOn1 = new MorsuinoMLState("shorton1", SHORT, true);
+        MorsuinoMLState shortOff1 = new MorsuinoMLState("shortoff1", SHORT, false);
+        MorsuinoMLState shortOn2 = new MorsuinoMLState("shorton2", SHORT, true);
+        MorsuinoMLState shortOff2 = new MorsuinoMLState("shortoff2", SHORT, false);
+        MorsuinoMLState shortOn3 = new MorsuinoMLState("shorton3", SHORT, true);
+        MorsuinoMLState shortOff3 = new MorsuinoMLState("shortoff3", SHORT, false);
+        MorsuinoMLState shortOn4 = new MorsuinoMLState("shorton4", SHORT, true);
+        MorsuinoMLState shortOff4 = new MorsuinoMLState("shortoff4", SHORT, false);
 
-        MorsuinoMLState longOn1 = new MorsuinoMLState("on1", LONG, true);
-        MorsuinoMLState longOff1 = new MorsuinoMLState("off1", SHORT, false);
-        MorsuinoMLState longOn2 = new MorsuinoMLState("on2", LONG, true);
-        MorsuinoMLState longOff2 = new MorsuinoMLState("off2", SHORT, false);
-        MorsuinoMLState longOn3 = new MorsuinoMLState("on3", LONG, true);
-        MorsuinoMLState longOff3 = new MorsuinoMLState("off3", SHORT, false);
-        MorsuinoMLState longOn4 = new MorsuinoMLState("on4", LONG, true);
-        MorsuinoMLState longOff4 = new MorsuinoMLState("off4", SHORT, false);
+        MorsuinoMLState longOn1 = new MorsuinoMLState("longon1", LONG, true);
+        MorsuinoMLState longOff1 = new MorsuinoMLState("longoff1", SHORT, false);
+        MorsuinoMLState longOn2 = new MorsuinoMLState("longon2", LONG, true);
+        MorsuinoMLState longOff2 = new MorsuinoMLState("longoff2", SHORT, false);
+        MorsuinoMLState longOn3 = new MorsuinoMLState("longon3", LONG, true);
+        MorsuinoMLState longOff3 = new MorsuinoMLState("longoff3", SHORT, false);
 
+        MorsuinoMLState silence = new MorsuinoMLState("finMot", SUPERLONG, false);
+        MorsuinoMLLetter space = new MorsuinoMLLetter();
+        space.addState(silence);
+        alphabet.addLetter(" ", space);
         MorsuinoMLLetter a = new MorsuinoMLLetter();
         a.addState(shortOn1);
         a.addState(shortOff1);
@@ -239,7 +238,7 @@ public class MorsuinoMLModel {
         k.addState(longOn2);
         k.addState(longOff2);
         alphabet.addLetter("K", k);
-        
+
         MorsuinoMLLetter l = new MorsuinoMLLetter();
         l.addState(shortOn1);
         l.addState(shortOff1);
@@ -284,7 +283,7 @@ public class MorsuinoMLModel {
         p.addState(shortOn2);
         p.addState(shortOff2);
         alphabet.addLetter("P", p);
-        
+
         MorsuinoMLLetter q = new MorsuinoMLLetter();
         q.addState(longOn1);
         q.addState(longOff1);
