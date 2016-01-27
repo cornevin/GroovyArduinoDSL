@@ -90,7 +90,6 @@ public class GroovuinoMLModel {
 		app.setInitial(this.initialState);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
-		SketchinoMLModel.addApp(app);
 		return codeGenerator.getResult();
 	}
 
