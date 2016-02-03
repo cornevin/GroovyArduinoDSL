@@ -15,6 +15,7 @@ import java.util.List;
 public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
+	private List<App> sketchs;
 	private State initialState;
 	private App app;
 
@@ -23,6 +24,7 @@ public class GroovuinoMLModel {
 	public GroovuinoMLModel(Binding binding) {
 		this.bricks = new ArrayList<>();
 		this.states = new ArrayList<>();
+		this.sketchs = new ArrayList<>();
 		app = new App();
 		this.binding = binding;
 	}
@@ -82,15 +84,34 @@ public class GroovuinoMLModel {
 		this.initialState = state;
 	}
 
+	public void createSketch(App app) {
+		this.sketchs.add(app);
+	}
+
+	public void composeApp(SketchCompositionStrategy compositionStrategy) throws Exception {
+		switch (compositionStrategy.toString()) {
+			case "manually" :
+				break;
+			case "state" :
+				break;
+			case "transition" :
+				for(App app : sketchs) {
+					composeAllApp(app);
+				}
+				break;
+		}
+	}
 
 
 
-	public void composedApp(App app) throws Exception {
+	private void composeAllApp(App app) throws Exception {
 		if(initialState == null) {
+			System.out.println("test");
 			initialState = app.getInitial();
 			bricks = app.getBricks();
 			states = app.getStates();
 		} else if(bricks.size() + app.getBricks().size() < 13) {
+			System.out.println("test2");
 			boolean composedOk = false;
 
 			for(State newState : app.getStates()) {

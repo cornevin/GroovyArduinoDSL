@@ -8,6 +8,6 @@ sketch "s2" inFile "groovy-dsl/scripts/morse/sosled.groovy"
 
 
 
-sketch "s3" isComposedBy sosbuzzer and sosled
+sketch "s3" isComposedBy sosbuzzer and sosled withStrategy transition
 
 export "SketchComposition"

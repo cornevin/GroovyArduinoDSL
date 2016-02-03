@@ -59,7 +59,6 @@ abstract class GroovuinoMLBasescript extends Script {
 					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createConditionalTransition(state1,state2, booleanExpressions, sensors,signals)
 
 					[becomes: { signal, bool = BooleanExpression.AND ->
-						print "$signal"
 						sensors.add(transitionBegin)
 						signals.add(signal)
 						booleanExpressions.add(bool)
@@ -82,8 +81,11 @@ abstract class GroovuinoMLBasescript extends Script {
 		def closure
 		[inFile: { path -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path, name) },
 		 isComposedBy: closure = { app ->
-			 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composedApp(app)
-			 [and: closure]
+			 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSketch(app)
+			 [withStrategy: { compositionStrategy ->
+				 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)
+			 },
+			 and: closure]
 		 }]
 	}
 
