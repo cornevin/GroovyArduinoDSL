@@ -1,6 +1,7 @@
 package groovuinoml.dsl
 
 import kernel.behavioral.BooleanExpression
+import kernel.behavioral.SketchCompositionStrategy
 import kernel.structural.Moment
 import kernel.structural.MomentUnit
 import kernel.structural.SIGNAL
@@ -23,6 +24,9 @@ class GroovuinoMLDSL {
 		binding.setVariable("low", SIGNAL.LOW)
 		binding.setVariable("and", BooleanExpression.AND)
 		binding.setVariable("or", BooleanExpression.OR)
+		binding.setVariable(SketchCompositionStrategy.MANUALLY.toString(), SketchCompositionStrategy.MANUALLY)
+		binding.setVariable(SketchCompositionStrategy.STATE.toString(), SketchCompositionStrategy.STATE)
+		binding.setVariable(SketchCompositionStrategy.TRANSITION.toString(), SketchCompositionStrategy.TRANSITION)
 
 		Number.metaClass.getS = { ->
 			new Moment(delegate, MomentUnit.second)
@@ -40,7 +44,7 @@ class GroovuinoMLDSL {
 		
 		binding.setScript(script)
 		script.setBinding(binding)
-		
+		SketchPool.setBinding(binding);
 		script.run()
 	}
 
@@ -49,6 +53,7 @@ class GroovuinoMLDSL {
 
 		binding.setScript(script)
 		script.setBinding(binding)
+
 		script.run()
 	}
 }

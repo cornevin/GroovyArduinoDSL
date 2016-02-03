@@ -7,6 +7,7 @@ import kernel.structural.SIGNAL
 import kernel.structural.Sensor
 
 abstract class GroovuinoMLBasescript extends Script {
+
 	// sensor "name" pin n
 	def sensor(String name) {
 		[pin: { n -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSensor(name, n) }]
@@ -58,7 +59,6 @@ abstract class GroovuinoMLBasescript extends Script {
 					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createConditionalTransition(state1,state2, booleanExpressions, sensors,signals)
 
 					[becomes: { signal, bool = BooleanExpression.AND ->
-						print "$signal"
 						sensors.add(transitionBegin)
 						signals.add(signal)
 						booleanExpressions.add(bool)
@@ -75,6 +75,18 @@ abstract class GroovuinoMLBasescript extends Script {
 	// export name
 	def export(String name) {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
+	}
+
+	def sketch(String name) {
+		def closure
+		[inFile: { path -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path, name) },
+		 isComposedBy: closure = { app ->
+			 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSketch(app)
+			 [withStrategy: { compositionStrategy ->
+				 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)
+			 },
+			 and: closure]
+		 }]
 	}
 
 	def exportToCompose(String name) {
