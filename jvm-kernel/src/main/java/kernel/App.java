@@ -58,11 +58,5 @@ public class App implements NamedElement, Visitable {
         this.states = states;
     }
 
-    public String getMessageToTranslate() {
-        return messageToTranslate;
-    }
 
-    public void setMessageToTranslate(String messageToTranslate) {
-        this.messageToTranslate = messageToTranslate;
-    }
 }
