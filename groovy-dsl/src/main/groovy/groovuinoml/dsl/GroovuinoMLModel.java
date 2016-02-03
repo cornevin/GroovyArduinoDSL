@@ -18,14 +18,11 @@ public class GroovuinoMLModel {
 	private State initialState;
 	private App app;
 
-	private static Binding binding;
-
-	private static List<App> apps;
-
+	private Binding binding;
 
 	public GroovuinoMLModel(Binding binding) {
-		this.bricks = new ArrayList<Brick>();
-		this.states = new ArrayList<State>();
+		this.bricks = new ArrayList<>();
+		this.states = new ArrayList<>();
 		app = new App();
 		this.binding = binding;
 	}
@@ -150,15 +147,6 @@ public class GroovuinoMLModel {
 	}
 
 
-
-	public static void addApp(App app) {
-		apps.add(app);
-		binding.setVariable(app.getName(), app);
-	}
-
-
-
-
 	@SuppressWarnings("rawtypes")
 	public Object generateCode(String appName) {
 		app.setName(appName);
@@ -167,7 +155,6 @@ public class GroovuinoMLModel {
 		app.setInitial(this.initialState);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
-//		SketchinoMLModel.addApp(app);
 		return codeGenerator.getResult();
 	}
 
@@ -176,7 +163,7 @@ public class GroovuinoMLModel {
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
-	//	this.binding.setVariable(app.getName(), app);
+
 		SketchPool.getBinding().setVariable(app.getName(), app);
 		SketchPool.getSketchPool().put(app.getName(), app);
 	}
