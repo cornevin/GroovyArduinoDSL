@@ -40,7 +40,7 @@ class GroovuinoMLDSL {
 		
 		binding.setScript(script)
 		script.setBinding(binding)
-		
+		SketchPool.setBinding(binding);
 		script.run()
 	}
 
