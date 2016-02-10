@@ -17,7 +17,6 @@ public class App implements NamedElement, Visitable {
     private List<Brick> bricks = new ArrayList<>();
     private List<State> states = new ArrayList<State>();
     private State initial;
-    private String messageToTranslate;
 
     @Override
     public void accept(Visitor visitor) {
