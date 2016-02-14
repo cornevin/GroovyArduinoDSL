@@ -1,7 +1,9 @@
 package groovuinoml.dsl
 import kernel.behavioral.Action
 import kernel.behavioral.BooleanExpression
+import kernel.behavioral.SketchCompositionStrategy
 import kernel.behavioral.State
+import kernel.behavioral.Transitionable
 import kernel.structural.Moment
 import kernel.structural.SIGNAL
 import kernel.structural.Sensor
@@ -42,12 +44,12 @@ abstract class GroovuinoMLBasescript extends Script {
 	}
 	
 	// initial state
-	def initial(State state) {
+	def initial(Transitionable state) {
 		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().setInitialState(state)
 	}
 	
 	// from state1 to state2 when sensor becomes signal [and sensor2 becomes signal2]
-	def from(State state1) {
+	def from(Transitionable state1) {
         List<Sensor> sensors = new ArrayList<>()
         List<SIGNAL> signals = new ArrayList<>()
 		List<BooleanExpression> booleanExpressions = new ArrayList<>()
@@ -77,17 +79,80 @@ abstract class GroovuinoMLBasescript extends Script {
 		println(((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().generateCode(name).toString())
 	}
 
+/*
 	def sketch(String name) {
 		def closure
+		def closure2
+
 		[inFile: { path -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path, name) },
 		 isComposedBy: closure = { app ->
 			 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSketch(app)
-			 [withStrategy: { compositionStrategy ->
+
+			 [into: { app2 ->
+
+
+				 [withStrategy: { SketchCompositionStrategy compositionStrategy ->
+					 ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)
+					 if (compositionStrategy.equals(SketchCompositionStrategy.MANUALLY)) {
+						 [with: { String stateName ->
+							 [mergingIn : { String stateName2 ->
+
+							 }]
+						 }]
+					 }
+				 },
+				  and : closure]
+			 }]
+		 }]
+	} */
+
+
+/*
+	def sketch(String name) {
+		def closure
+		def closure2
+		[inFile: { path -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path, name) },
+		 isComposedBy: closure = { app ->
+			 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSketch(app)
+			 [withStrategy: { SketchCompositionStrategy compositionStrategy ->
 				 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)
+				 if(compositionStrategy.equals(SketchCompositionStrategy.MANUALLY)) {
+					  [with: { stateName ->
+							printf("test")
+					 }]
+				 }
 			 },
 			 and: closure]
 		 }]
 	}
+*/
+	def sketch(String name) {
+		print(name)
+		def closure
+		[inFile: { path -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path, name) },
+			isComposedBy: closure = { app ->
+				((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSketch(app)
+				[withStrategy: { SketchCompositionStrategy compositionStrategy ->
+					((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)
+					if(compositionStrategy.equals(SketchCompositionStrategy.MANUALLY)) {
+						[with: { test2 ->
+							print(test2)
+						}]
+					}
+				}, and: closure]
+			}
+		]
+	}
+
+
+	def defineMacro(String name) {
+		[from: { State beginState ->
+			[to: { State endState ->
+				((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createMacro(name, beginState, endState)
+			}]
+		}]
+	}
+
 
 	def exportToCompose(String name) {
 		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().addApp(name)

@@ -1,28 +1,15 @@
 package kernel.behavioral;
 
 
-import kernel.NamedElement;
 import kernel.generator.Visitable;
 import kernel.generator.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class State implements NamedElement, Visitable {
+public class State extends Transitionable implements Visitable {
 
-	private String name;
 	private List<Action> actions = new ArrayList<Action>();
-	private Transition transition;
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public List<Action> getActions() {
 		return actions;
@@ -32,16 +19,29 @@ public class State implements NamedElement, Visitable {
 		this.actions = actions;
 	}
 
-	public Transition getTransition() {
-		return transition;
-	}
-
-	public void setTransition(Transition transition) {
-		this.transition = transition;
-	}
-
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.visit(this);
+	}
+
+	public Transitionable copy() {
+		State copy = new State();
+		copy.setName(this.getName());
+		List<Action> copyActions = new ArrayList<>();
+		for(Action original : this.getActions()) {
+			Action actionCopy = new Action();
+			actionCopy.setValue(original.getValue());
+			actionCopy.setActuator(original.getActuator());
+			copyActions.add(actionCopy);
+		}
+		copy.setActions(copyActions);
+
+		if(this.getTransition() != null) {
+			Transition copyTransition = this.getTransition().copy();
+			copy.setTransition(copyTransition);
+		}
+
+
+		return copy;
 	}
 }

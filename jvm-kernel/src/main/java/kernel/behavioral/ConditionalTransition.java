@@ -37,4 +37,13 @@ public class ConditionalTransition extends Transition {
     public int hashCode() {
         return conditionalStatement.hashCode();
     }
+
+    @Override
+    public Transition copy() {
+        ConditionalTransition copyConditionalTransition = new ConditionalTransition();
+        copyConditionalTransition.setNext(this.getNext());
+        copyConditionalTransition.setConditionalStatements(this.getConditionalStatements());
+
+        return copyConditionalTransition;
+    }
 }

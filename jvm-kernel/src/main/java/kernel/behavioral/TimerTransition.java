@@ -2,6 +2,7 @@ package kernel.behavioral;
 
 import kernel.generator.Visitor;
 import kernel.structural.Moment;
+import kernel.structural.MomentUnit;
 
 /**
  * Created by Quentin on 1/24/2016.
@@ -24,18 +25,19 @@ public class TimerTransition extends Transition {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TimerTransition)) return false;
+    public Transition copy() {
+        TimerTransition copyTransition = new TimerTransition();
+        int amount = this.getMoment().getAmount();
+        MomentUnit momentUnit = this.getMoment().getMomentUnit();
+        Moment moment = new Moment(amount, momentUnit);
+        copyTransition.setMoment(moment);
 
-        TimerTransition that = (TimerTransition) o;
+        State next = new State();
+        String name = this.getNext().getName();
+        next.setName(name);
+        copyTransition.setNext(next);
 
-        return moment.equals(that.moment);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return moment.hashCode();
+     //   copyTransition.setNext(next.copy());
+        return copyTransition;
     }
 }

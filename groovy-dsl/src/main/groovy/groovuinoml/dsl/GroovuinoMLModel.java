@@ -15,8 +15,9 @@ import java.util.List;
 public class GroovuinoMLModel {
 	private List<Brick> bricks;
 	private List<State> states;
+	private List<Macro> macros;
 	private List<App> sketchs;
-	private State initialState;
+	private Transitionable initialState;
 	private App app;
 
 	private Binding binding;
@@ -25,6 +26,7 @@ public class GroovuinoMLModel {
 		this.bricks = new ArrayList<>();
 		this.states = new ArrayList<>();
 		this.sketchs = new ArrayList<>();
+		this.macros = new ArrayList<>();
 		app = new App();
 		this.binding = binding;
 	}
@@ -73,14 +75,14 @@ public class GroovuinoMLModel {
 		from.setTransition(transition);
 	}
 
-	public void createTimerTransition(State from, State to, Moment moment) {
+	public void createTimerTransition(Transitionable from, Transitionable to, Moment moment) {
 		TimerTransition timerTransition = new TimerTransition();
 		timerTransition.setNext(to);
 		timerTransition.setMoment(moment);
 		from.setTransition(timerTransition);
 	}
 
-	public void setInitialState(State state) {
+	public void setInitialState(Transitionable state) {
 		this.initialState = state;
 	}
 
@@ -103,10 +105,44 @@ public class GroovuinoMLModel {
 	}
 
 
+	public void createMacro(String macroName, State beginState, State endState) {
+		Macro macro = new Macro();
+		macro.setBeginState(beginState);
+		macro.setEndState(endState);
+		macro.setName(macroName);
+		generateStateList(macro.getBeginState(), macro);
+		macros.add(macro);
+		this.binding.setVariable(macroName, macro);
+	}
+
+
+	private void generateStateList(Transitionable state, Macro macro) {
+		State myState = (State) state.copy();
+
+		String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
+		myState.setName(stateName);
+		if(state.getName().equals(macro.getEndState().getName())) {
+
+
+			macro.getStateList().add(myState);
+		} else {
+
+
+
+			String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
+			myState.getTransition().getNext().setName(nextStateName);
+
+			macro.getStateList().add(myState);
+			generateStateList(state.getTransition().getNext(), macro);
+		}
+	}
+
+
+
+
 
 	private void composeAllApp(App app) throws Exception {
 		if(initialState == null) {
-			System.out.println("test");
 			initialState = app.getInitial();
 			bricks = app.getBricks();
 			states = app.getStates();
@@ -174,6 +210,7 @@ public class GroovuinoMLModel {
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
+		app.setMacros(this.macros);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
 		return codeGenerator.getResult();

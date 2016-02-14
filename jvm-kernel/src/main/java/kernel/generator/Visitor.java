@@ -22,6 +22,7 @@ public abstract class Visitor<T> {
 	public abstract void visit(ConditionalTransition conditionalTransition);
 
 	public abstract void visit(TimerTransition timerTransition);
+	public abstract void visit(Macro macro);
 
 	/***********************
 	 ** Helper mechanisms **

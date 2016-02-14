@@ -5,7 +5,7 @@ package kernel.behavioral;
  */
 public enum SketchCompositionStrategy {
 
-    MANUALLY("manually"), STATE("state"), TRANSITION("transition");
+    MANUALLY("manual"), STATE("state"), TRANSITION("transition");
 
     private String name;
 

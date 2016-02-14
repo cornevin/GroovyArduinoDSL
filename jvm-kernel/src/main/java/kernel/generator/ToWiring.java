@@ -11,6 +11,7 @@ import kernel.structural.*;
 public class ToWiring extends Visitor<StringBuffer> {
 
 	private final static String CURRENT_STATE = "current_state";
+	private int macroIterator = 0;
 
 	public ToWiring() {
 		this.result = new StringBuffer();
@@ -35,6 +36,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 		for(State state: app.getStates()){
 			state.accept(this);
+		}
+
+		for(Macro macro : app.getMacros()) {
+			macro.accept(this);
+			macroIterator++;
 		}
 
 		w("void loop() {");
@@ -71,10 +77,28 @@ public class ToWiring extends Visitor<StringBuffer> {
 	}
 
 	@Override
+	public void visit(Macro macro) {
+		for(State state : macro.getStateList()) {
+			visit(state);
+		}
+/*		w(String.format("void macro%d_%s_%s() {\n", macroIterator, macro.getName(), macro.getBeginState().getName()));
+		generateActionsState(macro.getBeginState(), macro.getBeginState().getTransition());
+		w("}\n");*/
+	}
+
+	@Override
 	public void visit(State state) {
-		w(String.format("void state_%s() {",state.getName()));
-		for(Action action: state.getActions()) {
-			if((state.getTransition() instanceof TimerTransition) &&(action.getActuator() instanceof Buzzer) &&
+		if(state.getTransition() != null) {
+			w(String.format("void state_%s() {", state.getName()));
+			generateActionsState(state, state.getTransition());
+			w("}\n");
+		}
+	}
+
+
+	private void generateActionsState(State state, Transition transition) {
+		for (Action action : state.getActions()) {
+			if ((state.getTransition() instanceof TimerTransition) && (action.getActuator() instanceof Buzzer) &&
 					(action.getValue().equals(SIGNAL.HIGH))) {
 				int amount = ((TimerTransition) state.getTransition()).getMoment().getAmount();
 				w(String.format("	tone(%d,1200,%d);", action.getActuator().getPin(), amount * 100));
@@ -84,10 +108,10 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 		w("  boolean guard = millis() - time > debounce;");
 		context.put(CURRENT_STATE, state);
-		state.getTransition().accept(this);
-		w("}\n");
+		transition.accept(this);
 
 	}
+
 
 	@Override
 	public void visit(Action action) {
