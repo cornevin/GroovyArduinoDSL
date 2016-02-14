@@ -76,6 +76,7 @@ public class GroovuinoMLModel {
 	}
 
 	public void createTimerTransition(Transitionable from, Transitionable to, Moment moment) {
+		System.out.println(from.getName());
 		TimerTransition timerTransition = new TimerTransition();
 		timerTransition.setNext(to);
 		timerTransition.setMoment(moment);
@@ -110,7 +111,7 @@ public class GroovuinoMLModel {
 		macro.setBeginState(beginState);
 		macro.setEndState(endState);
 		macro.setName(macroName);
-		generateStateList(macro.getBeginState(), macro);
+	//	generateStateList(macro.getBeginState(), macro);
 		macros.add(macro);
 		this.binding.setVariable(macroName, macro);
 	}
@@ -123,7 +124,7 @@ public class GroovuinoMLModel {
 		myState.setName(stateName);
 		if(state.getName().equals(macro.getEndState().getName())) {
 
-
+			myState.setTransition(macro.getTransition());
 			macro.getStateList().add(myState);
 		} else {
 
@@ -210,6 +211,12 @@ public class GroovuinoMLModel {
 		app.setBricks(this.bricks);
 		app.setStates(this.states);
 		app.setInitial(this.initialState);
+
+		for(Macro macro : this.macros) {
+			generateStateList(macro.getBeginState(), macro);
+		}
+
+
 		app.setMacros(this.macros);
 		Visitor codeGenerator = new ToWiring();
 		app.accept(codeGenerator);
