@@ -76,7 +76,6 @@ public class GroovuinoMLModel {
 	}
 
 	public void createTimerTransition(Transitionable from, Transitionable to, Moment moment) {
-		System.out.println(from.getName());
 		TimerTransition timerTransition = new TimerTransition();
 		timerTransition.setNext(to);
 		timerTransition.setMoment(moment);
