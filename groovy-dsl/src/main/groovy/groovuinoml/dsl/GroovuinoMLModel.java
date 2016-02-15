@@ -236,7 +236,7 @@ public class GroovuinoMLModel {
 		return app;
 	}
 
-	public void getApp(String path, String name) {
+	public void getApp(String path) {
 		GroovuinoMLDSL dsl = new GroovuinoMLDSL();
 		dsl.generateModel(new File(path));
 	}

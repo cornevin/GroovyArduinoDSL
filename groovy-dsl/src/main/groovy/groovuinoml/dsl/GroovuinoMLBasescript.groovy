@@ -95,12 +95,14 @@ abstract class GroovuinoMLBasescript extends Script {
 		]
 	} */
 
+	def importSketch(String path) {
+		((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path)
+	}
 
 	def sketch(String name) {
 		def closure
 		List<String[]> statesList = new ArrayList<>();
-		[inFile: { path -> ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().getApp(path, name) },
-		 isComposedBy:  {  ...appList ->
+		[isComposedBy:  {  ...appList ->
 			 print "App list :  $appList \n"
 			 [withStrategy: closure = { SketchCompositionStrategy compositionStrategy ->
 				 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)

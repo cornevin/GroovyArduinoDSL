@@ -2,8 +2,8 @@
  * Created by Quentin on 1/26/2016.
  */
 
-sketch "Sketch1" inFile "groovy-dsl/scripts/morse/sosbuzzer.groovy"
-sketch "Sketch2" inFile "groovy-dsl/scripts/morse/sosled.groovy"
+importSketch "groovy-dsl/scripts/morse/sosbuzzer.groovy"
+importSketch "groovy-dsl/scripts/morse/sosled.groovy"
 
 
 
