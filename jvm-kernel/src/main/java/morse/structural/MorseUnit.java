@@ -9,7 +9,7 @@ import morse.behavioral.Duration;
 public abstract class MorseUnit implements NamedElement{
     private String name;
     private Duration duration;
-    private String symbol;
+    private String symbol; //useful only for toString method !
 
     public MorseUnit(String name, Duration duration, String symbol) {
         this.name = name;

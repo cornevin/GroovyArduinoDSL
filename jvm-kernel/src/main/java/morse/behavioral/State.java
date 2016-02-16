@@ -1,7 +1,6 @@
 package morse.behavioral;
 
 import morse.NamedElement;
-import morse.behavioral.Duration;
 import morse.generator.Visitable;
 import morse.generator.Visitor;
 

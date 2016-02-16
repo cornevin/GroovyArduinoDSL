@@ -30,6 +30,22 @@ abstract class MorsuinoMLBasescript extends Script {
 
 	// export name
 	def export(String name) {
-		((MorsuinoMLBinding) this.getBinding()).getMorsuinoMLModel().generateCode(name)
+		try {
+
+			if (name.isEmpty()) {
+				throw new MorsuinoMLScriptNameException("You need to declare a script name!")
+			}
+			if (!Character.isJavaIdentifierStart(name.charAt(0))) {
+				throw new MorsuinoMLScriptNameException("You need to start your script name with a valid character! \""+ name.charAt(0) +"\" is not. ")
+			}
+			for (int i = 1; i < name.length(); i++) {
+				if (!Character.isJavaIdentifierPart(name.charAt(i))) {
+					throw new MorsuinoMLScriptNameException("You can't include "+name.charAt(i)+" in your script name !")
+				}
+			}
+			((MorsuinoMLBinding) this.getBinding()).getMorsuinoMLModel().generateCode(name)
+		} catch (MorsuinoMLScriptNameException exception) {
+			System.out.println(exception)
+		}
 	}
 }
