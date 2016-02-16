@@ -44,7 +44,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 
 		w("void loop() {");
-		w(String.format("  state_%s();", app.getInitial().getName()));
+		if(app.getInitial() instanceof Macro) {
+			w(String.format("  state_%s();", ((Macro)app.getInitial()).getStateList().get(0).getName()));
+		} else {
+			w(String.format("  state_%s();", app.getInitial().getName()));
+		}
 		w("}");
 	}
 
@@ -66,6 +70,12 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("    time = millis();");
 		w(String.format("    state_%s();",conditionalTransition.getNext().getName()));
 		w("  } else {");
+
+		if(conditionalTransition.getNext() instanceof Macro) {
+		//	Macro macro = (Macro) conditionalTransition.getNext();
+			System.out.println("YOOOOOO00000000000000000000000000000000000000000000000000000O");
+		//	w(String.format("      %s", ((Macro) (conditionalTransition.getNext())).getBeginState().getName()));
+		}
 		w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
 		w("  }");
 	}

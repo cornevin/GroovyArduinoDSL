@@ -9,6 +9,7 @@ import kernel.structural.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -17,6 +18,7 @@ public class GroovuinoMLModel {
 	private List<State> states;
 	private List<Macro> macros;
 	private List<App> sketchs;
+	private List<List<String>> stateToCompose;
 	private Transitionable initialState;
 	private App app;
 
@@ -27,6 +29,7 @@ public class GroovuinoMLModel {
 		this.states = new ArrayList<>();
 		this.sketchs = new ArrayList<>();
 		this.macros = new ArrayList<>();
+		this.stateToCompose = new ArrayList<>();
 		app = new App();
 		this.binding = binding;
 	}
@@ -86,60 +89,66 @@ public class GroovuinoMLModel {
 		this.initialState = state;
 	}
 
-	public void createSketch(App app) {
-		this.sketchs.add(app);
+	public void createSketch(Object[] app) {
+		for(int i = 0; i < app.length; i++) {
+			this.sketchs.add((App) app[i]);
+		}
 	}
 
-	public void composeApp(SketchCompositionStrategy compositionStrategy) throws Exception {
+	public void createSketchManually(Object[] states) {
+		List<String> statesName = new ArrayList<>();
+		for(int i = 0; i < states.length; i++) {
+			statesName.add((String) states[i]);
+		}
+		this.stateToCompose.add(statesName);
+	}
+
+	public void composeApp(SketchCompositionStrategy compositionStrategy, Object[] apps, Object[] statesNames) throws Exception {
+		List<App> appList = new ArrayList<>();
+		List<List<String>> statesNamesList = new ArrayList<>();
+
+		for(int i = 0; i < apps.length; i++) {
+			appList.add((App) apps[i]);
+		}
+
+		for(int i = 0; i < statesNames.length; i++) {
+			String[] states = (String[]) statesNames[i];
+			statesNamesList.add(Arrays.asList(states));
+		}
+
 		switch (compositionStrategy.toString()) {
 			case "manually" :
+				composeAppManually(appList, statesNamesList);
 				break;
 			case "state" :
 				break;
 			case "transition" :
-				for(App app : sketchs) {
+				for(App app : appList) {
 					composeAllApp(app);
 				}
 				break;
 		}
 	}
 
+	private void composeAppManually(List<App> apps, List<List<String>> statesNamesList) {
+		for(List<String> statesNames : statesNamesList) {
+			for(int i = 0; i < statesNames.size(); i++) {
+				App app = apps.get(i);
+				if(checkExistingState(app, statesNames.get(i)) != -1) {
 
-	public void createMacro(String macroName, State beginState, State endState) {
-		Macro macro = new Macro();
-		macro.setBeginState(beginState);
-		macro.setEndState(endState);
-		macro.setName(macroName);
-	//	generateStateList(macro.getBeginState(), macro);
-		macros.add(macro);
-		this.binding.setVariable(macroName, macro);
-	}
-
-
-	private void generateStateList(Transitionable state, Macro macro) {
-		State myState = (State) state.copy();
-
-		String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
-		myState.setName(stateName);
-		if(state.getName().equals(macro.getEndState().getName())) {
-
-			myState.setTransition(macro.getTransition());
-			macro.getStateList().add(myState);
-		} else {
-
-
-
-			String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
-			myState.getTransition().getNext().setName(nextStateName);
-
-			macro.getStateList().add(myState);
-			generateStateList(state.getTransition().getNext(), macro);
+				}
+			}
 		}
 	}
 
-
-
-
+	private int checkExistingState(App app, String stateName) {
+		for(int i = 0; i < app.getStates().size(); i++) {
+			if(app.getStates().get(i).getName().equals(stateName)) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
 	private void composeAllApp(App app) throws Exception {
 		if(initialState == null) {
@@ -202,6 +211,39 @@ public class GroovuinoMLModel {
 			throw new Exception("Too much bricks");
 		}
 	}
+
+
+	public void createMacro(String macroName, State beginState, State endState) {
+		Macro macro = new Macro();
+		macro.setBeginState(beginState);
+		macro.setEndState(endState);
+		macro.setName(macroName);
+		macros.add(macro);
+		this.binding.setVariable(macroName, macro);
+	}
+
+
+	private void generateStateList(Transitionable state, Macro macro) {
+		State myState = (State) state.copy();
+
+		String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
+		myState.setName(stateName);
+		if(state.getName().equals(macro.getEndState().getName())) {
+
+			myState.setTransition(macro.getTransition());
+			macro.getStateList().add(myState);
+		} else {
+
+
+
+			String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
+			myState.getTransition().getNext().setName(nextStateName);
+
+			macro.getStateList().add(myState);
+			generateStateList(state.getTransition().getNext(), macro);
+		}
+	}
+
 
 
 	@SuppressWarnings("rawtypes")
