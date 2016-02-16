@@ -11,43 +11,46 @@ import kernel.structural.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class GroovuinoMLModel {
-    private List<Brick> bricks;
-    private List<State> states;
-    private List<Macro> macros;
-    private List<App> sketchs;
-    private Transitionable initialState;
-    private App app;
+	private List<Brick> bricks;
+	private List<State> states;
+	private List<Macro> macros;
+	private List<App> sketchs;
+	private List<List<String>> stateToCompose;
+	private Transitionable initialState;
+	private App app;
 
-    private Binding binding;
+	private Binding binding;
 
-    public GroovuinoMLModel(Binding binding) {
-        this.bricks = new ArrayList<>();
-        this.states = new ArrayList<>();
-        this.sketchs = new ArrayList<>();
-        this.macros = new ArrayList<>();
-        app = new App();
-        this.binding = binding;
-    }
-
-    public void createSensor(String name, Integer pinNumber) {
-        Sensor sensor = new Sensor();
-        sensor.setName(name);
-        sensor.setPin(pinNumber);
-        this.bricks.add(sensor);
-        this.binding.setVariable(name, sensor);
-    }
-
-    public void createBuzzer(String name, Integer pinNumber) {
-        Buzzer buzzer = new Buzzer();
-        buzzer.setName(name);
-        buzzer.setPin(pinNumber);
-        this.bricks.add(buzzer);
-        this.binding.setVariable(name, buzzer);
-    }
+	public GroovuinoMLModel(Binding binding) {
+		this.bricks = new ArrayList<>();
+		this.states = new ArrayList<>();
+		this.sketchs = new ArrayList<>();
+		this.macros = new ArrayList<>();
+		this.stateToCompose = new ArrayList<>();
+		app = new App();
+		this.binding = binding;
+	}
+	
+	public void createSensor(String name, Integer pinNumber) {
+		Sensor sensor = new Sensor();
+		sensor.setName(name);
+		sensor.setPin(pinNumber);
+		this.bricks.add(sensor);
+		this.binding.setVariable(name, sensor);
+	}
+	
+	public void createBuzzer(String name, Integer pinNumber) {
+		Buzzer buzzer = new Buzzer();
+		buzzer.setName(name);
+		buzzer.setPin(pinNumber);
+		this.bricks.add(buzzer);
+		this.binding.setVariable(name, buzzer);
+	}
 
     public void createLed(String name, Integer pinNumber) {
         Led led = new Led();
@@ -93,154 +96,192 @@ public class GroovuinoMLModel {
         this.initialState = state;
     }
 
-    public void createSketch(App app) {
-        this.sketchs.add(app);
-    }
+	public void createSketch(Object[] app) {
+		for(int i = 0; i < app.length; i++) {
+			this.sketchs.add((App) app[i]);
+		}
+	}
 
-    public void composeApp(SketchCompositionStrategy compositionStrategy) throws Exception {
-        switch (compositionStrategy.toString()) {
-            case "manually":
-                break;
-            case "state":
-                break;
-            case "transition":
-                for (App app : sketchs) {
-                    composeAllApp(app);
-                }
-                break;
-        }
-    }
+	public void createSketchManually(Object[] states) {
+		List<String> statesName = new ArrayList<>();
+		for(int i = 0; i < states.length; i++) {
+			statesName.add((String) states[i]);
+		}
+		this.stateToCompose.add(statesName);
+	}
 
+	public void composeApp(SketchCompositionStrategy compositionStrategy, Object[] apps, Object[] statesNames) throws Exception {
+		List<App> appList = new ArrayList<>();
+		List<List<String>> statesNamesList = new ArrayList<>();
 
-    public void createMacro(String macroName, State beginState, State endState) {
-        Macro macro = new Macro();
-        macro.setBeginState(beginState);
-        macro.setEndState(endState);
-        macro.setName(macroName);
-        //	generateStateList(macro.getBeginState(), macro);
-        macros.add(macro);
-        this.binding.setVariable(macroName, macro);
-    }
+		for(int i = 0; i < apps.length; i++) {
+			appList.add((App) apps[i]);
+		}
 
+		for(int i = 0; i < statesNames.length; i++) {
+			String[] states = (String[]) statesNames[i];
+			statesNamesList.add(Arrays.asList(states));
+		}
 
-    private void generateStateList(Transitionable state, Macro macro) {
-        State myState = (State) state.copy();
+		switch (compositionStrategy.toString()) {
+			case "manually" :
+				composeAppManually(appList, statesNamesList);
+				break;
+			case "state" :
+				break;
+			case "transition" :
+				for(App app : appList) {
+					composeAllApp(app);
+				}
+				break;
+		}
+	}
 
-        String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
-        myState.setName(stateName);
-        if (state.getName().equals(macro.getEndState().getName())) {
+	private void composeAppManually(List<App> apps, List<List<String>> statesNamesList) {
+		for(List<String> statesNames : statesNamesList) {
+			for(int i = 0; i < statesNames.size(); i++) {
+				App app = apps.get(i);
+				if(checkExistingState(app, statesNames.get(i)) != -1) {
 
-            myState.setTransition(macro.getTransition());
-            macro.getStateList().add(myState);
-        } else {
+				}
+			}
+		}
+	}
 
+	private int checkExistingState(App app, String stateName) {
+		for(int i = 0; i < app.getStates().size(); i++) {
+			if(app.getStates().get(i).getName().equals(stateName)) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
-            String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
-            myState.getTransition().getNext().setName(nextStateName);
+	private void composeAllApp(App app) throws Exception {
+		if(initialState == null) {
+			initialState = app.getInitial();
+			bricks = app.getBricks();
+			states = app.getStates();
+		} else if(bricks.size() + app.getBricks().size() < 13) {
+			System.out.println("test2");
+			boolean composedOk = false;
 
-            macro.getStateList().add(myState);
-            generateStateList(state.getTransition().getNext(), macro);
-        }
-    }
+			for(State newState : app.getStates()) {
+				for(State actualState : this.states) {
+					if((newState.getTransition() instanceof TimerTransition) && actualState.getTransition() instanceof TimerTransition) {
+						composedOk = true;
+						if(((TimerTransition) newState.getTransition()).getMoment().getAmount() == ((TimerTransition) actualState.getTransition()).getMoment().getAmount()) {
+							boolean addAction = false;
+							for(Action newAction :  newState.getActions() ) {
+								for(Action actualAction : actualState.getActions()) {
+									if(newAction.getValue().equals(actualAction.getValue())) {
+										addAction = true;
+									}
+								}
+								if(addAction) {
+									for(Action action : newState.getActions()) {
+										actualState.getActions().add(action);
+									}
+								}
+							}
 
-
-    private void composeAllApp(App app) throws Exception {
-        if (initialState == null) {
-            initialState = app.getInitial();
-            bricks = app.getBricks();
-            states = app.getStates();
-        } else if (bricks.size() + app.getBricks().size() < 13) {
-            System.out.println("test2");
-            boolean composedOk = false;
-
-            for (State newState : app.getStates()) {
-                for (State actualState : this.states) {
-                    if ((newState.getTransition() instanceof TimerTransition) && actualState.getTransition() instanceof TimerTransition) {
-                        composedOk = true;
-                        if (((TimerTransition) newState.getTransition()).getMoment().getAmount() == ((TimerTransition) actualState.getTransition()).getMoment().getAmount()) {
-                            boolean addAction = false;
-                            for (Action newAction : newState.getActions()) {
-                                for (Action actualAction : actualState.getActions()) {
-                                    if (newAction.getValue().equals(actualAction.getValue())) {
-                                        addAction = true;
-                                    }
-                                }
-                                if (addAction) {
-                                    for (Action action : newState.getActions()) {
-                                        actualState.getActions().add(action);
-                                    }
-                                }
-                            }
-
-                        }
-
-
-                    } else if (newState.getTransition() instanceof ConditionalTransition && (actualState.getTransition() instanceof ConditionalTransition)
-                            && actualState.getName().equals(newState.getName())) {
-                        ArrayList<Sensor> newSensors = (ArrayList<Sensor>) ((ConditionalTransition) newState.getTransition()).getConditionalStatements().getSensor();
-                        ArrayList<Sensor> actualSensors = (ArrayList<Sensor>) ((ConditionalTransition) actualState.getTransition()).getConditionalStatements().getSensor();
-
-
-                        for (Sensor sensor : newSensors) {
-                            for (Sensor sensor1 : actualSensors) {
-                                if (sensor.getPin() == sensor1.getPin()) {
-                                    composedOk = true;
-                                    for (Action action : newState.getActions()) {
-                                        actualState.getActions().add(action);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (composedOk) {
-                for (Brick brick : app.getBricks()) {
-                    if (brick instanceof Actuator) {
-                        bricks.add(brick);
-                    }
-                }
-            }
-        } else {
-            throw new Exception("Too much bricks");
-        }
-    }
+						}
 
 
-    @SuppressWarnings("rawtypes")
-    public Object generateCode(String appName) {
-        app.setName(appName);
-        app.setBricks(this.bricks);
-        app.setStates(this.states);
-        app.setInitial(this.initialState);
-
-        for (Macro macro : this.macros) {
-            generateStateList(macro.getBeginState(), macro);
-        }
+					} else if(newState.getTransition() instanceof ConditionalTransition && (actualState.getTransition() instanceof ConditionalTransition)
+							&& actualState.getName().equals(newState.getName())) {
+						ArrayList<Sensor> newSensors = (ArrayList<Sensor>) ((ConditionalTransition) newState.getTransition()).getConditionalStatements().getSensor();
+						ArrayList<Sensor> actualSensors = (ArrayList<Sensor>) ((ConditionalTransition) actualState.getTransition()).getConditionalStatements().getSensor();
 
 
-        app.setMacros(this.macros);
-        Visitor codeGenerator = new ToWiring();
-        app.accept(codeGenerator);
-        return codeGenerator.getResult();
-    }
+						for(Sensor sensor : newSensors) {
+							for(Sensor sensor1 : actualSensors) {
+								if(sensor.getPin() == sensor1.getPin()) {
+									composedOk = true;
+									for(Action action : newState.getActions()) {
+										actualState.getActions().add(action);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if(composedOk) {
+				for(Brick brick : app.getBricks()) {
+					if(brick instanceof Actuator) {
+						bricks.add(brick);
+					}
+				}
+			}
+		} else {
+			throw new Exception("Too much bricks");
+		}
+	}
 
-    public void addApp(String appName) {
-        app.setName(appName);
-        app.setBricks(this.bricks);
-        app.setStates(this.states);
-        app.setInitial(this.initialState);
 
-        SketchPool.getBinding().setVariable(app.getName(), app);
-        SketchPool.getSketchPool().put(app.getName(), app);
-    }
+	public void createMacro(String macroName, State beginState, State endState) {
+		Macro macro = new Macro();
+		macro.setBeginState(beginState);
+		macro.setEndState(endState);
+		macro.setName(macroName);
+		macros.add(macro);
+		this.binding.setVariable(macroName, macro);
+	}
 
-    public App getApp() {
-        return app;
-    }
 
-    public void getApp(String path) {
-        GroovuinoMLDSL dsl = new GroovuinoMLDSL();
-        dsl.generateModel(new File(path));
-    }
+	private void generateStateList(Transitionable state, Macro macro) {
+		State myState = (State) state.copy();
+
+		String stateName = String.format("macro_%s_%s", macro.getName(), state.getName());
+		myState.setName(stateName);
+		if(state.getName().equals(macro.getEndState().getName())) {
+			myState.setTransition(macro.getTransition());
+			macro.getStateList().add(myState);
+		} else {
+			State next = (State) myState.getTransition().getNext().copy();
+
+			String nextStateName = String.format("macro_%s_%s", macro.getName(), state.getTransition().getNext().getName());
+			next.setName(nextStateName);
+			myState.getTransition().setNext(next);
+			macro.getStateList().add(myState);
+			generateStateList(state.getTransition().getNext(), macro);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public Object generateCode(String appName) {
+		app.setName(appName);
+		app.setBricks(this.bricks);
+		app.setStates(this.states);
+		app.setInitial(this.initialState);
+
+		for(Macro macro : this.macros) {
+			generateStateList(macro.getBeginState(), macro);
+		}
+
+		app.setMacros(this.macros);
+		Visitor codeGenerator = new ToWiring();
+		app.accept(codeGenerator);
+		return codeGenerator.getResult();
+	}
+
+	public void addApp(String appName) {
+		app.setName(appName);
+		app.setBricks(this.bricks);
+		app.setStates(this.states);
+		app.setInitial(this.initialState);
+
+		SketchPool.getBinding().setVariable(app.getName(), app);
+		SketchPool.getSketchPool().put(app.getName(), app);
+	}
+
+	public App getApp() {
+		return app;
+	}
+
+	public void getApp(String path) {
+		GroovuinoMLDSL dsl = new GroovuinoMLDSL();
+		dsl.generateModel(new File(path));
+	}
 }

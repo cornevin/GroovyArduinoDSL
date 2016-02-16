@@ -44,7 +44,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		}
 
 		w("void loop() {");
-		w(String.format("  state_%s();", app.getInitial().getName()));
+		if(app.getInitial() instanceof Macro) {
+			w(String.format("  state_%s();", ((Macro)app.getInitial()).getStateList().get(0).getName()));
+		} else {
+			w(String.format("  state_%s();", app.getInitial().getName()));
+		}
 		w("}");
 	}
 
@@ -66,6 +70,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("    time = millis();");
 		w(String.format("    state_%s();",conditionalTransition.getNext().getName()));
 		w("  } else {");
+
+		if(conditionalTransition.getNext() instanceof Macro) {
+		//	Macro macro = (Macro) conditionalTransition.getNext();
+		//	w(String.format("      %s", ((Macro) (conditionalTransition.getNext())).getBeginState().getName()));
+		}
 		w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
 		w("  }");
 	}
@@ -73,7 +82,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 	@Override
 	public void visit(TimerTransition timerTransition) {
 		w(String.format("delay(%d);", timerTransition.getMoment().getAmount() * 100));
-		w(String.format("    state_%s();",timerTransition.getNext().getName()));
+		if(timerTransition.getNext() instanceof Macro) {
+			w(String.format("  state_%s();", ((Macro)timerTransition.getNext()).getStateList().get(0).getName()));
+		} else {
+			w(String.format("    state_%s();",timerTransition.getNext().getName()));
+		}
 	}
 
 	@Override

@@ -114,26 +114,25 @@ abstract class GroovuinoMLBasescript extends Script {
 	def sketch(String name) {
 		def closure
 		List<String[]> statesList = new ArrayList<>();
-		[isComposedBy:  {  ...appList ->
-			 print "App list :  $appList \n"
-			 [withStrategy: closure = { SketchCompositionStrategy compositionStrategy ->
-				 ((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy)
-				 print "test : " +  compositionStrategy.toString() + "\n"
-				 if(compositionStrategy.equals(SketchCompositionStrategy.MANUALLY)) {
-						 [mergingState: { ...stateList ->
-						 //statesList.add(stateList)
-						 print "State list $stateList \n"
-						 [and: closure]
-					 }]
-				 } else if(compositionStrategy.equals(SketchCompositionStrategy.STATE)) {
+		[isComposedBy: { ... appList ->
+			print "App list :  $appList \n"
+			((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createSketch(appList)
+			[withStrategy: closure = { SketchCompositionStrategy compositionStrategy ->
+				print "test : " + compositionStrategy.toString() + "\n"
+				if (compositionStrategy.equals(SketchCompositionStrategy.MANUALLY)) {
+					[mergingState: { ... stateList ->
+						((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createSketchManually(stateList)
 
-				 } else if(compositionStrategy.equals(SketchCompositionStrategy.TRANSITION)) {
-
-				 }
-			 }]
-		 }
-		]
+						//statesList.add(stateList)
+						print "State list $stateList \n"
+						[and: closure]
+					}]
+				}
+				((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy, appList, statesList)
+			}]
+		}]
 	}
+
 
 
 	def defineMacro(String name) {
