@@ -1,5 +1,7 @@
 package groovuinoml.dsl;
 
+import groovuinoml.dsl.exceptions.GroovuinoMLStateRedundancyException;
+import groovuinoml.dsl.exceptions.GroovuinoMLTooManyTransitionsException;
 import groovy.lang.Binding;
 import kernel.App;
 import kernel.behavioral.*;
@@ -13,231 +15,232 @@ import java.util.List;
 
 
 public class GroovuinoMLModel {
-	private List<Brick> bricks;
-	private List<State> states;
-	private List<Macro> macros;
-	private List<App> sketchs;
-	private Transitionable initialState;
-	private App app;
+    private List<Brick> bricks;
+    private List<State> states;
+    private List<Macro> macros;
+    private List<App> sketchs;
+    private Transitionable initialState;
+    private App app;
 
-	private Binding binding;
+    private Binding binding;
 
-	public GroovuinoMLModel(Binding binding) {
-		this.bricks = new ArrayList<>();
-		this.states = new ArrayList<>();
-		this.sketchs = new ArrayList<>();
-		this.macros = new ArrayList<>();
-		app = new App();
-		this.binding = binding;
-	}
-	
-	public void createSensor(String name, Integer pinNumber) {
-		Sensor sensor = new Sensor();
-		sensor.setName(name);
-		sensor.setPin(pinNumber);
-		this.bricks.add(sensor);
-		this.binding.setVariable(name, sensor);
-	}
-	
-	public void createBuzzer(String name, Integer pinNumber) {
-		Buzzer buzzer = new Buzzer();
-		buzzer.setName(name);
-		buzzer.setPin(pinNumber);
-		this.bricks.add(buzzer);
-		this.binding.setVariable(name, buzzer);
-	}
+    public GroovuinoMLModel(Binding binding) {
+        this.bricks = new ArrayList<>();
+        this.states = new ArrayList<>();
+        this.sketchs = new ArrayList<>();
+        this.macros = new ArrayList<>();
+        app = new App();
+        this.binding = binding;
+    }
 
-	public void createLed(String name, Integer pinNumber) {
-		Led led = new Led();
-		led.setName(name);
-		led.setPin(pinNumber);
-		this.bricks.add(led);
-		this.binding.setVariable(name, led);
-	}
-	
-	public void createState(String name, List<Action> actions) {
-		State state = new State();
-		state.setName(name);
-		state.setActions(actions);
-		this.states.add(state);
-		this.binding.setVariable(name, state);
-	}
-	
-	public void createConditionalTransition(State from, State to, List<BooleanExpression> booleanExpressions, List<Sensor> sensors, List<SIGNAL> signals) {
-		ConditionalStatement conditionalStatement = new ConditionalStatement();
-		conditionalStatement.setBooleanExpressions(booleanExpressions);
-		conditionalStatement.setSensor(sensors);
-		conditionalStatement.setValue(signals);
+    public void createSensor(String name, Integer pinNumber) {
+        Sensor sensor = new Sensor();
+        sensor.setName(name);
+        sensor.setPin(pinNumber);
+        this.bricks.add(sensor);
+        this.binding.setVariable(name, sensor);
+    }
 
-		ConditionalTransition transition = new ConditionalTransition();
-		transition.setNext(to);
-		transition.setConditionalStatements(conditionalStatement);
-		from.setTransition(transition);
-	}
+    public void createBuzzer(String name, Integer pinNumber) {
+        Buzzer buzzer = new Buzzer();
+        buzzer.setName(name);
+        buzzer.setPin(pinNumber);
+        this.bricks.add(buzzer);
+        this.binding.setVariable(name, buzzer);
+    }
 
-	public void createTimerTransition(Transitionable from, Transitionable to, Moment moment) {
-		TimerTransition timerTransition = new TimerTransition();
-		timerTransition.setNext(to);
-		timerTransition.setMoment(moment);
-		from.setTransition(timerTransition);
-	}
+    public void createLed(String name, Integer pinNumber) {
+        Led led = new Led();
+        led.setName(name);
+        led.setPin(pinNumber);
+        this.bricks.add(led);
+        this.binding.setVariable(name, led);
+    }
 
-	public void setInitialState(Transitionable state) {
-		this.initialState = state;
-	}
+    public void createState(String name, List<Action> actions) throws GroovuinoMLStateRedundancyException {
+        for (State aState : states) {
+            if (aState.getName().equals(name)) {
+                throw new GroovuinoMLStateRedundancyException("You can't use twice the same state name ! (" + name + ") Maybe consider using a macro ?");
+            }
+        }
+        State state = new State();
+        state.setName(name);
+        state.setActions(actions);
+        this.binding.setVariable(name, state);
+        this.states.add(state);
+    }
 
-	public void createSketch(App app) {
-		this.sketchs.add(app);
-	}
+    public void createConditionalTransition(State from, State to, List<BooleanExpression> booleanExpressions, List<Sensor> sensors, List<SIGNAL> signals) throws GroovuinoMLTooManyTransitionsException {
+        ConditionalStatement conditionalStatement = new ConditionalStatement();
+        conditionalStatement.setBooleanExpressions(booleanExpressions);
+        conditionalStatement.setSensor(sensors);
+        conditionalStatement.setValue(signals);
 
-	public void composeApp(SketchCompositionStrategy compositionStrategy) throws Exception {
-		switch (compositionStrategy.toString()) {
-			case "manually" :
-				break;
-			case "state" :
-				break;
-			case "transition" :
-				for(App app : sketchs) {
-					composeAllApp(app);
-				}
-				break;
-		}
-	}
+        ConditionalTransition transition = new ConditionalTransition();
+        transition.setNext(to);
+        transition.setConditionalStatements(conditionalStatement);
+        from.setTransition(transition);
+    }
 
+    public void createTimerTransition(Transitionable from, Transitionable to, Moment moment)  throws GroovuinoMLTooManyTransitionsException {
+        TimerTransition timerTransition = new TimerTransition();
+        timerTransition.setNext(to);
+        timerTransition.setMoment(moment);
+        from.setTransition(timerTransition);
+    }
 
-	public void createMacro(String macroName, State beginState, State endState) {
-		Macro macro = new Macro();
-		macro.setBeginState(beginState);
-		macro.setEndState(endState);
-		macro.setName(macroName);
-	//	generateStateList(macro.getBeginState(), macro);
-		macros.add(macro);
-		this.binding.setVariable(macroName, macro);
-	}
+    public void setInitialState(Transitionable state) {
+        this.initialState = state;
+    }
+
+    public void createSketch(App app) {
+        this.sketchs.add(app);
+    }
+
+    public void composeApp(SketchCompositionStrategy compositionStrategy) throws Exception {
+        switch (compositionStrategy.toString()) {
+            case "manually":
+                break;
+            case "state":
+                break;
+            case "transition":
+                for (App app : sketchs) {
+                    composeAllApp(app);
+                }
+                break;
+        }
+    }
 
 
-	private void generateStateList(Transitionable state, Macro macro) {
-		State myState = (State) state.copy();
-
-		String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
-		myState.setName(stateName);
-		if(state.getName().equals(macro.getEndState().getName())) {
-
-			myState.setTransition(macro.getTransition());
-			macro.getStateList().add(myState);
-		} else {
-
+    public void createMacro(String macroName, State beginState, State endState) {
+        Macro macro = new Macro();
+        macro.setBeginState(beginState);
+        macro.setEndState(endState);
+        macro.setName(macroName);
+        //	generateStateList(macro.getBeginState(), macro);
+        macros.add(macro);
+        this.binding.setVariable(macroName, macro);
+    }
 
 
-			String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
-			myState.getTransition().getNext().setName(nextStateName);
+    private void generateStateList(Transitionable state, Macro macro) {
+        State myState = (State) state.copy();
 
-			macro.getStateList().add(myState);
-			generateStateList(state.getTransition().getNext(), macro);
-		}
-	}
+        String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
+        myState.setName(stateName);
+        if (state.getName().equals(macro.getEndState().getName())) {
 
-
-
-
-
-	private void composeAllApp(App app) throws Exception {
-		if(initialState == null) {
-			initialState = app.getInitial();
-			bricks = app.getBricks();
-			states = app.getStates();
-		} else if(bricks.size() + app.getBricks().size() < 13) {
-			System.out.println("test2");
-			boolean composedOk = false;
-
-			for(State newState : app.getStates()) {
-				for(State actualState : this.states) {
-					if((newState.getTransition() instanceof TimerTransition) && actualState.getTransition() instanceof TimerTransition) {
-						composedOk = true;
-						if(((TimerTransition) newState.getTransition()).getMoment().getAmount() == ((TimerTransition) actualState.getTransition()).getMoment().getAmount()) {
-							boolean addAction = false;
-							for(Action newAction :  newState.getActions() ) {
-								for(Action actualAction : actualState.getActions()) {
-									if(newAction.getValue().equals(actualAction.getValue())) {
-										addAction = true;
-									}
-								}
-								if(addAction) {
-									for(Action action : newState.getActions()) {
-										actualState.getActions().add(action);
-									}
-								}
-							}
-
-						}
+            myState.setTransition(macro.getTransition());
+            macro.getStateList().add(myState);
+        } else {
 
 
-					} else if(newState.getTransition() instanceof ConditionalTransition && (actualState.getTransition() instanceof ConditionalTransition)
-							&& actualState.getName().equals(newState.getName())) {
-						ArrayList<Sensor> newSensors = (ArrayList<Sensor>) ((ConditionalTransition) newState.getTransition()).getConditionalStatements().getSensor();
-						ArrayList<Sensor> actualSensors = (ArrayList<Sensor>) ((ConditionalTransition) actualState.getTransition()).getConditionalStatements().getSensor();
+            String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
+            myState.getTransition().getNext().setName(nextStateName);
+
+            macro.getStateList().add(myState);
+            generateStateList(state.getTransition().getNext(), macro);
+        }
+    }
 
 
-						for(Sensor sensor : newSensors) {
-							for(Sensor sensor1 : actualSensors) {
-								if(sensor.getPin() == sensor1.getPin()) {
-									composedOk = true;
-									for(Action action : newState.getActions()) {
-										actualState.getActions().add(action);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			if(composedOk) {
-				for(Brick brick : app.getBricks()) {
-					if(brick instanceof Actuator) {
-						bricks.add(brick);
-					}
-				}
-			}
-		} else {
-			throw new Exception("Too much bricks");
-		}
-	}
+    private void composeAllApp(App app) throws Exception {
+        if (initialState == null) {
+            initialState = app.getInitial();
+            bricks = app.getBricks();
+            states = app.getStates();
+        } else if (bricks.size() + app.getBricks().size() < 13) {
+            System.out.println("test2");
+            boolean composedOk = false;
+
+            for (State newState : app.getStates()) {
+                for (State actualState : this.states) {
+                    if ((newState.getTransition() instanceof TimerTransition) && actualState.getTransition() instanceof TimerTransition) {
+                        composedOk = true;
+                        if (((TimerTransition) newState.getTransition()).getMoment().getAmount() == ((TimerTransition) actualState.getTransition()).getMoment().getAmount()) {
+                            boolean addAction = false;
+                            for (Action newAction : newState.getActions()) {
+                                for (Action actualAction : actualState.getActions()) {
+                                    if (newAction.getValue().equals(actualAction.getValue())) {
+                                        addAction = true;
+                                    }
+                                }
+                                if (addAction) {
+                                    for (Action action : newState.getActions()) {
+                                        actualState.getActions().add(action);
+                                    }
+                                }
+                            }
+
+                        }
 
 
-	@SuppressWarnings("rawtypes")
-	public Object generateCode(String appName) {
-		app.setName(appName);
-		app.setBricks(this.bricks);
-		app.setStates(this.states);
-		app.setInitial(this.initialState);
-
-		for(Macro macro : this.macros) {
-			generateStateList(macro.getBeginState(), macro);
-		}
+                    } else if (newState.getTransition() instanceof ConditionalTransition && (actualState.getTransition() instanceof ConditionalTransition)
+                            && actualState.getName().equals(newState.getName())) {
+                        ArrayList<Sensor> newSensors = (ArrayList<Sensor>) ((ConditionalTransition) newState.getTransition()).getConditionalStatements().getSensor();
+                        ArrayList<Sensor> actualSensors = (ArrayList<Sensor>) ((ConditionalTransition) actualState.getTransition()).getConditionalStatements().getSensor();
 
 
-		app.setMacros(this.macros);
-		Visitor codeGenerator = new ToWiring();
-		app.accept(codeGenerator);
-		return codeGenerator.getResult();
-	}
+                        for (Sensor sensor : newSensors) {
+                            for (Sensor sensor1 : actualSensors) {
+                                if (sensor.getPin() == sensor1.getPin()) {
+                                    composedOk = true;
+                                    for (Action action : newState.getActions()) {
+                                        actualState.getActions().add(action);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (composedOk) {
+                for (Brick brick : app.getBricks()) {
+                    if (brick instanceof Actuator) {
+                        bricks.add(brick);
+                    }
+                }
+            }
+        } else {
+            throw new Exception("Too much bricks");
+        }
+    }
 
-	public void addApp(String appName) {
-		app.setName(appName);
-		app.setBricks(this.bricks);
-		app.setStates(this.states);
-		app.setInitial(this.initialState);
 
-		SketchPool.getBinding().setVariable(app.getName(), app);
-		SketchPool.getSketchPool().put(app.getName(), app);
-	}
+    @SuppressWarnings("rawtypes")
+    public Object generateCode(String appName) {
+        app.setName(appName);
+        app.setBricks(this.bricks);
+        app.setStates(this.states);
+        app.setInitial(this.initialState);
 
-	public App getApp() {
-		return app;
-	}
+        for (Macro macro : this.macros) {
+            generateStateList(macro.getBeginState(), macro);
+        }
 
-	public void getApp(String path) {
-		GroovuinoMLDSL dsl = new GroovuinoMLDSL();
-		dsl.generateModel(new File(path));
-	}
+
+        app.setMacros(this.macros);
+        Visitor codeGenerator = new ToWiring();
+        app.accept(codeGenerator);
+        return codeGenerator.getResult();
+    }
+
+    public void addApp(String appName) {
+        app.setName(appName);
+        app.setBricks(this.bricks);
+        app.setStates(this.states);
+        app.setInitial(this.initialState);
+
+        SketchPool.getBinding().setVariable(app.getName(), app);
+        SketchPool.getSketchPool().put(app.getName(), app);
+    }
+
+    public App getApp() {
+        return app;
+    }
+
+    public void getApp(String path) {
+        GroovuinoMLDSL dsl = new GroovuinoMLDSL();
+        dsl.generateModel(new File(path));
+    }
 }

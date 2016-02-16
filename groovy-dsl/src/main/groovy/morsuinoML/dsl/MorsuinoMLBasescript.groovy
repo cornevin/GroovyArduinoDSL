@@ -1,5 +1,7 @@
 package morsuinoML.dsl
 
+import morsuinoML.exceptions.MorsuinoMLScriptNameException
+
 
 abstract class MorsuinoMLBasescript extends Script {
 
@@ -45,7 +47,7 @@ abstract class MorsuinoMLBasescript extends Script {
 			}
 			((MorsuinoMLBinding) this.getBinding()).getMorsuinoMLModel().generateCode(name)
 		} catch (MorsuinoMLScriptNameException exception) {
-			System.out.println(exception)
+			System.err.println(exception)
 		}
 	}
 }

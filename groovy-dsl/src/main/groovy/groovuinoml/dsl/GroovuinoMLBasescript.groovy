@@ -1,5 +1,7 @@
 package groovuinoml.dsl
 
+import groovuinoml.dsl.exceptions.GroovuinoMLStateRedundancyException
+import groovuinoml.dsl.exceptions.GroovuinoMLTooManyTransitionsException
 import kernel.behavioral.*
 import kernel.structural.Moment
 import kernel.structural.SIGNAL
@@ -25,11 +27,13 @@ abstract class GroovuinoMLBasescript extends Script {
 	// state "name" means actuator becomes signal [and actuator becomes signal]*n
 	def state(String name) {
 		List<Action> actions = new ArrayList<>()
-		((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
-		// recursive closure to allow multiple and statements
-		def closure
-		closure = { actuator -> 
-			[becomes: { signal ->
+		try {
+			((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createState(name, actions)
+
+			// recursive closure to allow multiple and statements
+			def closure
+			closure = { actuator ->
+				[becomes: { signal ->
 				Action action = new Action()
 				action.setActuator(actuator)
 				action.setValue(signal)
@@ -38,6 +42,10 @@ abstract class GroovuinoMLBasescript extends Script {
 			}]
 		}
 		[means: closure]
+}
+		catch (GroovuinoMLStateRedundancyException exception) {
+			System.err.println(exception)
+		}
 	}
 	
 	// initial state
@@ -50,25 +58,29 @@ abstract class GroovuinoMLBasescript extends Script {
         List<Sensor> sensors = new ArrayList<>()
         List<SIGNAL> signals = new ArrayList<>()
 		List<BooleanExpression> booleanExpressions = new ArrayList<>()
+		try {
+			def closure
+			[to: { state2 ->
+				[when: closure = { transitionBegin ->
+					if (transitionBegin instanceof Sensor) {
+						((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createConditionalTransition(state1, state2, booleanExpressions, sensors, signals)
 
-        def closure
-		[to: { state2 ->
-			[when: closure = { transitionBegin ->
-				if(transitionBegin instanceof Sensor) {
-					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createConditionalTransition(state1,state2, booleanExpressions, sensors,signals)
+						[becomes: { signal, bool = BooleanExpression.AND ->
+							sensors.add(transitionBegin)
+							signals.add(signal)
+							booleanExpressions.add(bool)
+							[when: closure]
+						}]
+					} else if (transitionBegin instanceof Moment) {
+						((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTimerTransition(state1, state2, transitionBegin)
+					}
+				}]
 
-					[becomes: { signal, bool = BooleanExpression.AND ->
-						sensors.add(transitionBegin)
-						signals.add(signal)
-						booleanExpressions.add(bool)
-						[when: closure]
-					}]
-				} else if( transitionBegin instanceof Moment) {
-					((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createTimerTransition(state1, state2, transitionBegin)
-				}
 			}]
-
-		}]
+		}
+		catch (GroovuinoMLTooManyTransitionsException exception) {
+			System.err.println(exception);
+		}
 	}
 
 	// export name

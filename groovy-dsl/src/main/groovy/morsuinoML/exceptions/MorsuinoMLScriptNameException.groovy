@@ -1,4 +1,4 @@
-package morsuinoML.dsl
+package morsuinoML.exceptions
 
 /**
  * Created by Garance on 16/02/2016.

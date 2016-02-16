@@ -21,7 +21,7 @@ public class GroovuinoML {
             dsl.eval(new File(args[0]));
         } else {
             //System.out.println("/!\\ Missing arg: Please specify the path to a Groovy script file to execute");
-            dsl.eval(new File("groovy-dsl/scripts/SketchComposition.groovy"));
+            dsl.eval(new File("groovy-dsl/scripts/basescenarios/MultiStateAlarm.groovy"));
         }
 
     }
