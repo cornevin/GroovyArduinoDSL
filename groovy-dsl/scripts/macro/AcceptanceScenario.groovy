@@ -24,13 +24,10 @@ from led2off to led2on when button becomes high
 defineMacro "led1Blink" from led1on to led1off
 defineMacro "led2Blink" from led2on to led2off
 
-from led1Blink to led2Blink when 3.s    //button becomes high
-from led2Blink to off when 3.s    // button becomes high
+from led1Blink to led2Blink when 3.s
+from led2Blink to off when 3.s
 
-from off to led1Blink when 3.s      //button becomes high
+from off to led1Blink when 3.s
 
 initial off
 export "AcceptanceScenarioMacro"
-
-
-// TODO : Gérer les transition vers les macros !

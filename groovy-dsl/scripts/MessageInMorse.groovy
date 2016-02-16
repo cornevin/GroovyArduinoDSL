@@ -3,9 +3,8 @@
  */
 
 buzzer "buzzer" pin 12
+led "myLed" pin 11
 
-translate "SOS" with buzzer
-    then "DSL" with led
+translate "SOS"
 
-//after 3.s
-export "sosled"
+export "sosLedBuzzer"
