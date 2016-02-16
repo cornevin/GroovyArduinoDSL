@@ -19,6 +19,7 @@ from dot5 to dot6 when 1.s
 from dot6 to dot1 when 1.s
 
 defineMacro "macroS" from dot1 to dot5
+defineMacro "macroP" from dot1 to dot2
 
 from macroS to dot1 when 3.s
 

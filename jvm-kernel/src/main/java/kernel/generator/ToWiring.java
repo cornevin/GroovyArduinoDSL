@@ -73,7 +73,6 @@ public class ToWiring extends Visitor<StringBuffer> {
 
 		if(conditionalTransition.getNext() instanceof Macro) {
 		//	Macro macro = (Macro) conditionalTransition.getNext();
-			System.out.println("YOOOOOO00000000000000000000000000000000000000000000000000000O");
 		//	w(String.format("      %s", ((Macro) (conditionalTransition.getNext())).getBeginState().getName()));
 		}
 		w(String.format("    state_%s();", ((State) context.get(CURRENT_STATE)).getName()));
@@ -83,7 +82,11 @@ public class ToWiring extends Visitor<StringBuffer> {
 	@Override
 	public void visit(TimerTransition timerTransition) {
 		w(String.format("delay(%d);", timerTransition.getMoment().getAmount() * 100));
-		w(String.format("    state_%s();",timerTransition.getNext().getName()));
+		if(timerTransition.getNext() instanceof Macro) {
+			w(String.format("  state_%s();", ((Macro)timerTransition.getNext()).getStateList().get(0).getName()));
+		} else {
+			w(String.format("    state_%s();",timerTransition.getNext().getName()));
+		}
 	}
 
 	@Override

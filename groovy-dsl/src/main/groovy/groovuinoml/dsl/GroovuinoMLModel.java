@@ -226,25 +226,21 @@ public class GroovuinoMLModel {
 	private void generateStateList(Transitionable state, Macro macro) {
 		State myState = (State) state.copy();
 
-		String stateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getName());
+		String stateName = String.format("macro_%s_%s", macro.getName(), state.getName());
 		myState.setName(stateName);
 		if(state.getName().equals(macro.getEndState().getName())) {
-
 			myState.setTransition(macro.getTransition());
 			macro.getStateList().add(myState);
 		} else {
+			State next = (State) myState.getTransition().getNext().copy();
 
-
-
-			String nextStateName = String.format("macro%d_%s_%s", macros.size(), macro.getName(), state.getTransition().getNext().getName());
-			myState.getTransition().getNext().setName(nextStateName);
-
+			String nextStateName = String.format("macro_%s_%s", macro.getName(), state.getTransition().getNext().getName());
+			next.setName(nextStateName);
+			myState.getTransition().setNext(next);
 			macro.getStateList().add(myState);
 			generateStateList(state.getTransition().getNext(), macro);
 		}
 	}
-
-
 
 	@SuppressWarnings("rawtypes")
 	public Object generateCode(String appName) {
@@ -256,7 +252,6 @@ public class GroovuinoMLModel {
 		for(Macro macro : this.macros) {
 			generateStateList(macro.getBeginState(), macro);
 		}
-
 
 		app.setMacros(this.macros);
 		Visitor codeGenerator = new ToWiring();
