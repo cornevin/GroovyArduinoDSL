@@ -1,5 +1,6 @@
 package morsuinoML.dsl
 
+import morsuinoML.exceptions.MorsuinoMLBadLetterException
 import morsuinoML.exceptions.MorsuinoMLScriptNameException
 
 
@@ -21,7 +22,11 @@ abstract class MorsuinoMLBasescript extends Script {
     def translate(String message) {
 		String[] messageList = message.collect{ it }
 		messageList.each { letter ->
-			((MorsuinoMLBinding)this.getBinding()).getMorsuinoMLModel().addLetter(letter);
+			try {
+				((MorsuinoMLBinding)this.getBinding()).getMorsuinoMLModel().addLetter(letter)
+			}catch(MorsuinoMLBadLetterException exception) {
+				System.err.println(exception);
+			}
 		};
     }
 
@@ -37,7 +42,7 @@ abstract class MorsuinoMLBasescript extends Script {
 			}
 			for (int i = 1; i < name.length(); i++) {
 				if (!Character.isJavaIdentifierPart(name.charAt(i))) {
-					throw new MorsuinoMLScriptNameException("You can't include "+name.charAt(i)+" in your script name !")
+					throw new MorsuinoMLScriptNameException("You can't include \""+name.charAt(i)+"\" in your script name !")
 				}
 			}
 			((MorsuinoMLBinding) this.getBinding()).getMorsuinoMLModel().generateCode(name)

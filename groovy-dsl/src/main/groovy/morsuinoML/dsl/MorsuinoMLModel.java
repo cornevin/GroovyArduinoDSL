@@ -8,6 +8,7 @@ import morse.generator.Visitor;
 import morse.behavioral.Actuator;
 import morse.structural.Alphabet;
 import morse.structural.Letter;
+import morsuinoML.exceptions.MorsuinoMLBadLetterException;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -65,9 +66,11 @@ public class MorsuinoMLModel {
     }
 
     public void addLetter(String letter) {
-        System.out.println(letter);
         //ici, besoin d'aller chercher la lettre dans l'alphabet
-        message.add(Alphabet.getMorseLetter(letter));
+        if (Character.isLetter(letter.charAt(0)) || letter.equals(" ")) {
+            message.add(Alphabet.getMorseLetter(letter));
+        }
+        else throw new MorsuinoMLBadLetterException("This character is invalid in morse ! Try again withtout \""+letter+"\". ");
 
     }
 

@@ -4,7 +4,7 @@
 
 led "myLed" pin 11
 
-translate "SOS"
+translate "SOS !"
 
 //after 3.s
-export "testOffDuration"
+export "SOSWITHLED"

@@ -54,7 +54,6 @@ public class ToWiring extends Visitor<StringBuffer> {
         states.add(new State("off", Duration.SHORT));
         w("\n\n// Each letter states declarations ");
         for (Letter letter : app.getMessage()) {
-            System.out.println(letter);
             letter.accept(this);
             //Après la description de chaque lettre, besoin d'une pause de 3 unités : on verra + tard.
         }
