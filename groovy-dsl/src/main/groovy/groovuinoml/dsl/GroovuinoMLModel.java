@@ -1,5 +1,6 @@
 package groovuinoml.dsl;
 
+import groovuinoml.dsl.exceptions.GroovuinoMLOverloadedPinException;
 import groovuinoml.dsl.exceptions.GroovuinoMLStateRedundancyException;
 import groovuinoml.dsl.exceptions.GroovuinoMLTooManyTransitionsException;
 import groovy.lang.Binding;
@@ -51,12 +52,19 @@ public class GroovuinoMLModel {
         try {
             brick.setName(name);
             brick.setPin(pinNumber);
+            for (Brick aBrick : this.bricks) {
+                if (aBrick.getPin() == pinNumber) {
+                    throw new GroovuinoMLOverloadedPinException("You overloaded pin "+ pinNumber +".\n" +
+                            "You can't put "+aBrick.getName()+" and " +name+ " on it !");
+                }
+            }
             this.bricks.add(brick);
             this.binding.setVariable(name, brick);
         }
-        catch (OutOfDigitalPinRange exception) {
+        catch (OutOfDigitalPinRange | GroovuinoMLOverloadedPinException exception) {
             System.err.println(exception);
         }
+
     }
 
     public void createLed(String name, Integer pinNumber) {

@@ -1,6 +1,6 @@
 sensor "button" pin 9
 led "led" pin 12
-buzzer "buzz" pin 13
+buzzer "buzz" pin 12
 
 state "buzzOn" means buzz becomes high
 state "ledOn" means led becomes high and buzz becomes low

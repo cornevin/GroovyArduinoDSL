@@ -16,12 +16,7 @@ abstract class GroovuinoMLBasescript extends Script {
 
 	// buzzer "name" pin n
 	def buzzer(String name) {
-		try {
-			[pin: { n -> ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createBuzzer(name, n) }]
-		}
-		catch (Exception e) {
-			System.err.println(e);
-		}
+		[pin: { n -> ((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createBuzzer(name, n) }]
 	}
 
 	// led "name" pin n
