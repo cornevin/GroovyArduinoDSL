@@ -11,7 +11,6 @@ initial off
 from off to buzzOn when button becomes high
 from buzzOn to ledOn when button becomes high
 from ledOn to off when button becomes high
-from ledOn to buzzOn when button becomes low
 
 export "MultiStateAlarm!"
 

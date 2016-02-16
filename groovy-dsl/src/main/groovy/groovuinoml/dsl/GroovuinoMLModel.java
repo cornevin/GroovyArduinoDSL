@@ -5,6 +5,7 @@ import groovuinoml.dsl.exceptions.GroovuinoMLTooManyTransitionsException;
 import groovy.lang.Binding;
 import kernel.App;
 import kernel.behavioral.*;
+import kernel.exceptions.OutOfDigitalPinRange;
 import kernel.generator.ToWiring;
 import kernel.generator.Visitor;
 import kernel.structural.*;
@@ -38,26 +39,29 @@ public class GroovuinoMLModel {
 
     public void createSensor(String name, Integer pinNumber) {
         Sensor sensor = new Sensor();
-        sensor.setName(name);
-        sensor.setPin(pinNumber);
-        this.bricks.add(sensor);
-        this.binding.setVariable(name, sensor);
+        createBrick(sensor, name, pinNumber);
     }
 
     public void createBuzzer(String name, Integer pinNumber) {
         Buzzer buzzer = new Buzzer();
-        buzzer.setName(name);
-        buzzer.setPin(pinNumber);
-        this.bricks.add(buzzer);
-        this.binding.setVariable(name, buzzer);
+        createBrick(buzzer, name, pinNumber);
+    }
+
+    private void createBrick(Brick brick,String name,Integer pinNumber) {
+        try {
+            brick.setName(name);
+            brick.setPin(pinNumber);
+            this.bricks.add(brick);
+            this.binding.setVariable(name, brick);
+        }
+        catch (OutOfDigitalPinRange exception) {
+            System.err.println(exception);
+        }
     }
 
     public void createLed(String name, Integer pinNumber) {
         Led led = new Led();
-        led.setName(name);
-        led.setPin(pinNumber);
-        this.bricks.add(led);
-        this.binding.setVariable(name, led);
+        createBrick(led, name, pinNumber);
     }
 
     public void createState(String name, List<Action> actions) throws GroovuinoMLStateRedundancyException {
@@ -74,6 +78,10 @@ public class GroovuinoMLModel {
     }
 
     public void createConditionalTransition(State from, State to, List<BooleanExpression> booleanExpressions, List<Sensor> sensors, List<SIGNAL> signals) throws GroovuinoMLTooManyTransitionsException {
+        if (from.getTransition() != null) {
+            throw new GroovuinoMLTooManyTransitionsException("You can't set two outgoing transitions for one state !" +
+                    "\n (from "+ from.getName()+" to " +from.getTransition().getNext().getName()+" and to "+to.getName()+"). \n" );
+        }
         ConditionalStatement conditionalStatement = new ConditionalStatement();
         conditionalStatement.setBooleanExpressions(booleanExpressions);
         conditionalStatement.setSensor(sensors);
@@ -86,6 +94,10 @@ public class GroovuinoMLModel {
     }
 
     public void createTimerTransition(Transitionable from, Transitionable to, Moment moment) throws GroovuinoMLTooManyTransitionsException {
+        if (from.getTransition() != null) {
+            throw new GroovuinoMLTooManyTransitionsException("You can't set two outgoing transitions for one state !" +
+                    "\n (from "+ from.getName()+" to " +from.getTransition().getNext().getName()+" and to "+to.getName()+"). \n" );
+        }
         TimerTransition timerTransition = new TimerTransition();
         timerTransition.setNext(to);
         timerTransition.setMoment(moment);
