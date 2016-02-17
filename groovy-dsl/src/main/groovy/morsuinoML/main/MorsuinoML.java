@@ -16,12 +16,6 @@ import java.io.File;
 public class MorsuinoML {
 	public static void main(String[] args) {
 		MorsuinoMLDSL dsl = new MorsuinoMLDSL();
-	//	if(args.length > 0) {
-			//dsl.eval(new File(args[0]));
-	//		dsl.eval(new File("groovy-dsl/scripts/DualCheckAlarm.groovy"));
-			dsl.eval(new File("groovy-dsl/scripts/SimpleMorse.groovy"));
-	//	} else {
-	//		System.out.println("/!\\ Missing arg: Please specify the path to a Groovy script file to execute");
-	//	}
+		dsl.eval(new File("groovy-dsl/scripts/morse/SimpleMorse.groovy"));
 	}
 }

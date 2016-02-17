@@ -21,4 +21,4 @@ Then, you have to run whichever main you want (groovy-dsl/src/main/groovy/morsui
 Morsuino's main always looks for a file called "MessageInMorse.groovy"
 
 Groovuino's main can use a parameter when launched, with the path to the script you want.
-This path should be relative, starting at groovy-dsl. 
+This path should be relative, starting at groovy-dsl.
