@@ -1,4 +1,4 @@
-package groovuinoml.dsl.exceptions
+package groovuinoml.exceptions
 
 /**
  * Created by Garance on 16/02/2016.

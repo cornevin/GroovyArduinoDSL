@@ -1,8 +1,8 @@
 package groovuinoml.dsl;
 
-import groovuinoml.dsl.exceptions.GroovuinoMLOverloadedPinException;
-import groovuinoml.dsl.exceptions.GroovuinoMLStateRedundancyException;
-import groovuinoml.dsl.exceptions.GroovuinoMLTooManyTransitionsException;
+import groovuinoml.exceptions.GroovuinoMLOverloadedPinException;
+import groovuinoml.exceptions.GroovuinoMLStateRedundancyException;
+import groovuinoml.exceptions.GroovuinoMLTooManyTransitionsException;
 import groovy.lang.Binding;
 import kernel.App;
 import kernel.behavioral.*;

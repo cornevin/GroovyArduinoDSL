@@ -1,7 +1,7 @@
 package groovuinoml.dsl
 
-import groovuinoml.dsl.exceptions.GroovuinoMLStateRedundancyException
-import groovuinoml.dsl.exceptions.GroovuinoMLTooManyTransitionsException
+import groovuinoml.exceptions.GroovuinoMLStateRedundancyException
+import groovuinoml.exceptions.GroovuinoMLTooManyTransitionsException
 import kernel.behavioral.*
 import kernel.structural.Moment
 import kernel.structural.SIGNAL
