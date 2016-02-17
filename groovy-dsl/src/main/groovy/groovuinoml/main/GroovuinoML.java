@@ -11,7 +11,7 @@ import java.io.File;
  * <p>
  * "We've Got A Groovy Thing Goin'"!
  *
- * @author Thomas Moreau
+ * @author Thomas Moreau & Quentin Cornevin
  */
 public class GroovuinoML {
     public static void main(String[] args) {
@@ -21,7 +21,8 @@ public class GroovuinoML {
             dsl.eval(new File(args[0]));
         } else {
             //System.out.println("/!\\ Missing arg: Please specify the path to a Groovy script file to execute");
-            dsl.eval(new File("groovy-dsl/scripts/basescenarios/MultiStateAlarm.groovy"));
+            //dsl.eval(new File("groovy-dsl/scripts/basescenarios/MultiStateAlarm.groovy"));
+             dsl.eval(new File("groovy-dsl/scripts/sketch/SketchComposition.groovy"));
         }
 
     }

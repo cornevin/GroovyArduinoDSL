@@ -1,7 +1,6 @@
 package kernel;
 
 import kernel.behavioral.Macro;
-import kernel.behavioral.State;
 import kernel.behavioral.Transitionable;
 import kernel.generator.Visitable;
 import kernel.generator.Visitor;
@@ -17,7 +16,7 @@ public class App implements NamedElement, Visitable {
 
     private String name;
     private List<Brick> bricks = new ArrayList<>();
-    private List<State> states = new ArrayList<>();
+    private List<Transitionable> states = new ArrayList<>();
     private List<Macro> macros = new ArrayList<>();
     private Transitionable initial;
 
@@ -52,11 +51,11 @@ public class App implements NamedElement, Visitable {
         this.initial = initial;
     }
 
-    public List<State> getStates() {
+    public List<Transitionable> getStates() {
         return states;
     }
 
-    public void setStates(List<State> states) {
+    public void setStates(List<Transitionable> states) {
         this.states = states;
     }
 

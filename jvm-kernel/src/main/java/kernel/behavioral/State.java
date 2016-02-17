@@ -1,13 +1,12 @@
 package kernel.behavioral;
 
 
-import kernel.generator.Visitable;
 import kernel.generator.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class State extends Transitionable implements Visitable {
+public class State extends Transitionable {
 
 	private List<Action> actions = new ArrayList<Action>();
 
@@ -43,5 +42,21 @@ public class State extends Transitionable implements Visitable {
 
 
 		return copy;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof State)) return false;
+
+		State state = (State) o;
+
+		return actions.equals(state.actions);
+
+	}
+
+	@Override
+	public int hashCode() {
+		return actions.hashCode();
 	}
 }

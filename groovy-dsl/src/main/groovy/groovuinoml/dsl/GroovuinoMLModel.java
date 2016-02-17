@@ -13,15 +13,19 @@ import kernel.structural.*;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class GroovuinoMLModel {
     private List<Brick> bricks;
-    private List<State> states;
+    private List<Transitionable> states;
     private List<Macro> macros;
     private List<App> sketchs;
+
+    private SketchCompositionStrategy sketchCompositionStrategy;
+    private List<App[]> apps;
+    private List<String[]> statesNames;
+
     private List<List<String>> stateToCompose;
     private Transitionable initialState;
     private App app;
@@ -34,6 +38,8 @@ public class GroovuinoMLModel {
         this.sketchs = new ArrayList<>();
         this.macros = new ArrayList<>();
         this.stateToCompose = new ArrayList<>();
+        this.apps = new ArrayList<>();
+        this.statesNames = new ArrayList<>();
         app = new App();
         this.binding = binding;
     }
@@ -73,7 +79,7 @@ public class GroovuinoMLModel {
     }
 
     public void createState(String name, List<Action> actions) throws GroovuinoMLStateRedundancyException {
-        for (State aState : states) {
+        for (Transitionable aState : states) {
             if (aState.getName().equals(name)) {
                 throw new GroovuinoMLStateRedundancyException("You can't use twice the same state name ! (" + name + ") Maybe consider using a macro ?");
             }
@@ -130,42 +136,124 @@ public class GroovuinoMLModel {
         this.stateToCompose.add(statesName);
     }
 
-    public void composeApp(SketchCompositionStrategy compositionStrategy, Object[] apps, Object[] statesNames) throws Exception {
-        List<App> appList = new ArrayList<>();
-        List<List<String>> statesNamesList = new ArrayList<>();
-
-        for (int i = 0; i < apps.length; i++) {
-            appList.add((App) apps[i]);
-        }
-
-        for (int i = 0; i < statesNames.length; i++) {
-            String[] states = (String[]) statesNames[i];
-            statesNamesList.add(Arrays.asList(states));
-        }
-
-        switch (compositionStrategy.toString()) {
+    public void createCompositionStrategy(SketchCompositionStrategy sketchCompositionStrategy) {
+        switch(sketchCompositionStrategy.toString()) {
             case "manually":
-                composeAppManually(appList, statesNamesList);
+                this.sketchCompositionStrategy = SketchCompositionStrategy.MANUALLY;
                 break;
-            case "state":
+            case "state" :
+                this.sketchCompositionStrategy = SketchCompositionStrategy.STATE;
                 break;
-            case "transition":
-                for (App app : appList) {
-                    composeAllApp(app);
-                }
+            case "transition" :
+                this.sketchCompositionStrategy = SketchCompositionStrategy.TRANSITION;
                 break;
         }
     }
 
-    private void composeAppManually(List<App> apps, List<List<String>> statesNamesList) {
-        for (List<String> statesNames : statesNamesList) {
-            for (int i = 0; i < statesNames.size(); i++) {
-                App app = apps.get(i);
-                if (checkExistingState(app, statesNames.get(i)) != -1) {
 
-                }
+    public void createSketchComposition(App[] myApps, String[] myStatesNames) {
+        this.apps.add(myApps);
+        this.statesNames.add(myStatesNames);
+    }
+
+
+    public void composeApp() throws Exception {
+        List<App> appList = new ArrayList<>();
+        for(App[] appsArray : this.apps) {
+            for(int i = 0; i < appsArray.length; i++){
+                appList.add(appsArray[i]);
             }
         }
+
+        if(this.sketchCompositionStrategy != null) {
+            switch (sketchCompositionStrategy.toString()) {
+                case "manually":
+                    composeAppManually(appList, this.statesNames);
+                    break;
+                case "state":
+                    break;
+                case "transition":
+                    for (App app : appList) {
+                        composeAllApp(app);
+                    }
+                    break;
+                default :
+                    break;
+            }
+        }
+    }
+
+    private void composeAppManually(List<App> apps, List<String[]> statesNamesList) {
+        this.initialState = apps.get(0).getInitial().copy();
+        List<Brick> myBricks = new ArrayList<>();
+
+        List<Transitionable> myStates = new ArrayList<>();
+        myStates.add(apps.get(0).getInitial().copy());
+
+
+        for(App app : apps) {
+            for(Brick brick : app.getBricks()) {
+                myBricks.add(brick);
+            }
+        }
+
+        this.bricks = myBricks;
+
+        for (String[] statesNames : statesNamesList) {
+            List<Transitionable> stateToCompose = new ArrayList<>();
+            for (int i = 0; i < statesNames.length; i++) {
+                App app = apps.get(i);
+                int statePositionInList = checkExistingState(app, statesNames[i]);
+                if (statePositionInList != -1) {
+                    Transitionable transitionable = app.getStates().get(statePositionInList);
+                    stateToCompose.add(transitionable);
+                }
+            }
+
+            Transitionable myState = stateToCompose.get(0);
+
+            boolean composed = true;
+
+            for(int i = 1; i < stateToCompose.size(); i++) {
+                if(!(stateToCompose.get(i).getTransition().getNext().equals(myState.getTransition().getNext()))) {
+                    composed = false;
+                }
+            }
+
+            State composedState = new State();
+            composedState.setActions(new ArrayList<>());
+            composedState.setName("merged_state");
+            composedState.setTransition(null);
+
+            for (Transitionable state : stateToCompose) {
+                composedState.setName(composedState.getName() + "_" + state.getName());
+                List<Action> actions = ((State) state).getActions();
+                for (Action action : actions) {
+                    composedState.getActions().add(action);
+                }
+                Transition transition = state.getTransition().copy();
+                if(composedState.getTransition() == null) {
+                    composedState.setTransition(transition);
+                } else {
+                    if (transition instanceof TimerTransition) {
+                        // For the moment we decided that the first timer value
+                    } else {
+                        if(composedState.getTransition() instanceof TimerTransition) {
+                            // throw exception
+                        } else {
+                            List<BooleanExpression> booleanExpressions = ((ConditionalTransition) composedState.getTransition()).getConditionalStatements().getBooleanExpressions();
+                            for(BooleanExpression booleanExpression : ((ConditionalTransition) transition).getConditionalStatements().getBooleanExpressions()) {
+                                booleanExpressions.add(booleanExpression);
+                            }
+                        }
+                    }
+                }
+                myStates.add(composedState);
+
+            }
+        }
+
+        this.states = myStates;
     }
 
     private int checkExistingState(App app, String stateName) {
@@ -183,24 +271,23 @@ public class GroovuinoMLModel {
             bricks = app.getBricks();
             states = app.getStates();
         } else if (bricks.size() + app.getBricks().size() < 13) {
-            System.out.println("test2");
             boolean composedOk = false;
 
-            for (State newState : app.getStates()) {
-                for (State actualState : this.states) {
+            for (Transitionable newState : app.getStates()) {
+                for (Transitionable actualState : this.states) {
                     if ((newState.getTransition() instanceof TimerTransition) && actualState.getTransition() instanceof TimerTransition) {
                         composedOk = true;
                         if (((TimerTransition) newState.getTransition()).getMoment().getAmount() == ((TimerTransition) actualState.getTransition()).getMoment().getAmount()) {
                             boolean addAction = false;
-                            for (Action newAction : newState.getActions()) {
-                                for (Action actualAction : actualState.getActions()) {
+                            for (Action newAction : ((State) newState).getActions()) {
+                                for (Action actualAction : ((State) actualState).getActions()) {
                                     if (newAction.getValue().equals(actualAction.getValue())) {
                                         addAction = true;
                                     }
                                 }
                                 if (addAction) {
-                                    for (Action action : newState.getActions()) {
-                                        actualState.getActions().add(action);
+                                    for (Action action : ((State) newState).getActions()) {
+                                        ((State) actualState).getActions().add(action);
                                     }
                                 }
                             }
@@ -218,8 +305,8 @@ public class GroovuinoMLModel {
                             for (Sensor sensor1 : actualSensors) {
                                 if (sensor.getPin() == sensor1.getPin()) {
                                     composedOk = true;
-                                    for (Action action : newState.getActions()) {
-                                        actualState.getActions().add(action);
+                                    for (Action action : ((State)newState).getActions()) {
+                                        ((State) actualState).getActions().add(action);
                                     }
                                 }
                             }
@@ -270,7 +357,9 @@ public class GroovuinoMLModel {
     }
 
     @SuppressWarnings("rawtypes")
-    public Object generateCode(String appName) {
+    public Object generateCode(String appName) throws Exception {
+        composeApp();
+
         app.setName(appName);
         app.setBricks(this.bricks);
         app.setStates(this.states);

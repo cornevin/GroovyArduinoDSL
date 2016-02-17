@@ -2,6 +2,7 @@ package groovuinoml.dsl
 
 import groovuinoml.exceptions.GroovuinoMLStateRedundancyException
 import groovuinoml.exceptions.GroovuinoMLTooManyTransitionsException
+import kernel.App
 import kernel.behavioral.*
 import kernel.structural.Moment
 import kernel.structural.SIGNAL
@@ -113,24 +114,18 @@ abstract class GroovuinoMLBasescript extends Script {
 
 	def sketch(String name) {
 		def closure
-		List<String[]> statesList = new ArrayList<>();
 		[isComposedBy: { ... appList ->
-			print "App list :  $appList \n"
-			((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createSketch(appList)
 			[withStrategy: closure = { SketchCompositionStrategy compositionStrategy ->
-				print "test : " + compositionStrategy.toString() + "\n"
 				if (compositionStrategy.equals(SketchCompositionStrategy.MANUALLY)) {
 					[mergingState: { ... stateList ->
-						((GroovuinoMLBinding) this.getBinding()).getGroovuinoMLModel().createSketchManually(stateList)
-
-						//statesList.add(stateList)
-						print "State list $stateList \n"
+						((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createCompositionStrategy(compositionStrategy)
+						((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().createSketchComposition((App[]) appList,(String[]) stateList)
 						[and: closure]
 					}]
 				}
-				((GroovuinoMLBinding)this.getBinding()).getGroovuinoMLModel().composeApp(compositionStrategy, appList, statesList)
 			}]
 		}]
+
 	}
 
 

@@ -3,10 +3,10 @@
  */
 
 sensor "button" pin 9
-buzzer "buzzer" pin 11
+led "led" pin 11
 
-state "on" means buzzer becomes high
-state "off" means buzzer becomes low
+state "on" means led becomes high
+state "off" means led becomes low
 
 initial off
 

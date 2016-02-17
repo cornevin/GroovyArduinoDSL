@@ -1,6 +1,5 @@
 package kernel.behavioral;
 
-import kernel.generator.Visitable;
 import kernel.generator.Visitor;
 
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import java.util.List;
 /**
  * Created by Quentin on 2/10/2016.
  */
-public class Macro extends Transitionable implements Visitable {
+public class Macro extends Transitionable {
 
     private State beginState;
     private State endState;

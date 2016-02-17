@@ -33,14 +33,18 @@ public class ToWiring extends Visitor<StringBuffer> {
 		w("}\n");
 
 		w("long time = 0; long debounce = 200;\n");
-
+/*
 		for(State state: app.getStates()){
 			state.accept(this);
 		}
 
 		for(Macro macro : app.getMacros()) {
 			macro.accept(this);
-			macroIterator++;
+			//macroIterator++;
+		} */
+
+		for(Transitionable transitionable : app.getStates()) {
+			transitionable.accept(this);
 		}
 
 		w("void loop() {");
